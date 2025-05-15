@@ -17,23 +17,23 @@ export const scenarios = [
   },
   {
     "id": "ss-popup-bases-loaded-2outs",
-    "positionFocus": ["SS", "2B", "P", "C"],
+    "positionFocus": ["SS"],
     "baseRunners": { "first": true, "second": true, "third": true },
     "outs": 2,
     "ballLocation": { "x": 220, "y": 150 },
     "situation": "Bases are loaded with 2 outs. A high pop-up is hit near the pitcher's mound, slightly towards second base.",
-    "question": "Who should ideally catch this ball?",
+    "question": "What should you do?",
     "options": [
-      { "text": "The shortstop or second baseman, calling for it loudly.", "isCorrect": true },
-      { "text": "The pitcher, as it's near the mound.", "isCorrect": false },
-      { "text": "The catcher, running out to get it.", "isCorrect": false },
-      { "text": "The third baseman, ranging over.", "isCorrect": false }
+      { "text": "Call for the ball loudly and make the catch if you can reach it.", "isCorrect": true },
+      { "text": "Let the pitcher catch it since it's near the mound.", "isCorrect": false },
+      { "text": "Let the second baseman catch it.", "isCorrect": false },
+      { "text": "Stay at shortstop and watch the play.", "isCorrect": false }
     ],
-    "explanation": "Middle infielders (SS or 2B) generally have priority on pop-ups in the infield they can reach, as they are moving towards the ball and have a better angle. Clear communication is key. The pitcher should yield to an infielder who calls for it."
+    "explanation": "As the shortstop, you have priority on pop-ups in the infield you can reach. Clear communication is key. Call for the ball loudly if you can make the play."
   },
   {
     "id": "cf-flyball-runner-on-3rd-1out",
-    "positionFocus": ["CF", "LF", "RF"],
+    "positionFocus": ["CF"],
     "baseRunners": { "first": false, "second": false, "third": true },
     "outs": 1,
     "ballLocation": { "x": 200, "y": 100 },
@@ -127,7 +127,7 @@ export const scenarios = [
     "explanation": "With a clean field, the standard play for a pitcher on a comebacker with no one on is to throw to first base for the out."
   },
   {
-    "id": "c-passed-ball-runner-on-3rd",
+    "id": "c-passed-ball-runner-on-3rd-1out",
     "positionFocus": ["C"],
     "baseRunners": { "first": false, "second": false, "third": true },
     "outs": 1,
@@ -173,5 +173,661 @@ export const scenarios = [
       { "text": "Cover home plate.", "isCorrect": false }
     ],
     "explanation": "If the first baseman is drawn away from the bag (e.g., charging a bunt or slow roller) and the pitcher fields the ball, the second baseman is often responsible for covering first base to take the throw."
+  },
+  {
+    "id": "rf-line-drive-runner-on-2nd-1out",
+    "positionFocus": ["RF"],
+    "baseRunners": { "first": false, "second": true, "third": false },
+    "outs": 1,
+    "ballLocation": { "x": 320, "y": 80 },
+    "situation": "Runner on 2nd, 1 out. A line drive is hit to you in right field.",
+    "question": "What's your priority after fielding the ball?",
+    "options": [
+      { "text": "Make a strong throw to third base to prevent the runner from advancing.", "isCorrect": true },
+      { "text": "Throw to second base to keep the runner from advancing.", "isCorrect": false },
+      { "text": "Throw to first base to get the batter.", "isCorrect": false },
+      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
+    ],
+    "explanation": "With a runner on second and one out, preventing the runner from advancing to third is crucial. A strong, accurate throw to third base is the priority, as it keeps the runner from being in scoring position."
+  },
+  {
+    "id": "lf-flyball-runner-on-1st-0outs",
+    "positionFocus": ["LF"],
+    "baseRunners": { "first": true, "second": false, "third": false },
+    "outs": 0,
+    "ballLocation": { "x": 80, "y": 80 },
+    "situation": "Runner on 1st, 0 outs. A deep fly ball is hit to you in left field.",
+    "question": "What's your priority after catching the ball?",
+    "options": [
+      { "text": "Make a strong throw to second base to prevent the runner from advancing.", "isCorrect": true },
+      { "text": "Throw to first base to get the batter.", "isCorrect": false },
+      { "text": "Throw to third base to prevent a triple.", "isCorrect": false },
+      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
+    ],
+    "explanation": "With a runner on first and no outs, preventing the runner from advancing to second is crucial. A strong, accurate throw to second base is the priority, as it keeps the runner from being in scoring position."
+  },
+  {
+    "id": "lf-flyball-runner-on-2nd-1out",
+    "positionFocus": ["LF"],
+    "baseRunners": { "first": false, "second": true, "third": false },
+    "outs": 1,
+    "ballLocation": { "x": 80, "y": 80 },
+    "situation": "Runner on 2nd, 1 out. A deep fly ball is hit to you in left field.",
+    "question": "What's your priority after catching the ball?",
+    "options": [
+      { "text": "Make a strong throw to third base to prevent the runner from advancing.", "isCorrect": true },
+      { "text": "Throw to second base to keep the runner from advancing.", "isCorrect": false },
+      { "text": "Throw to first base to get the batter.", "isCorrect": false },
+      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
+    ],
+    "explanation": "With a runner on second and one out, preventing the runner from advancing to third is crucial. A strong, accurate throw to third base is the priority, as it keeps the runner from being in scoring position."
+  },
+  {
+    "id": "lf-flyball-runner-on-3rd-2outs",
+    "positionFocus": ["LF"],
+    "baseRunners": { "first": false, "second": false, "third": true },
+    "outs": 2,
+    "ballLocation": { "x": 80, "y": 80 },
+    "situation": "Runner on 3rd, 2 outs. A deep fly ball is hit to you in left field.",
+    "question": "What's your priority after catching the ball?",
+    "options": [
+      { "text": "Make a strong throw to home plate to prevent the runner from scoring.", "isCorrect": true },
+      { "text": "Throw to third base to keep the runner from advancing.", "isCorrect": false },
+      { "text": "Throw to second base to prevent a double.", "isCorrect": false },
+      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
+    ],
+    "explanation": "With a runner on third and two outs, preventing the runner from scoring is the top priority. A strong, accurate throw to home plate is crucial, as it could be the final out of the inning."
+  },
+  {
+    "id": "lf-line-drive-runner-on-1st-0outs",
+    "positionFocus": ["LF"],
+    "baseRunners": { "first": true, "second": false, "third": false },
+    "outs": 0,
+    "ballLocation": { "x": 80, "y": 80 },
+    "situation": "Runner on 1st, 0 outs. A line drive is hit to you in left field.",
+    "question": "What's your priority after fielding the ball?",
+    "options": [
+      { "text": "Make a strong throw to second base to prevent the runner from advancing.", "isCorrect": true },
+      { "text": "Throw to first base to get the batter.", "isCorrect": false },
+      { "text": "Throw to third base to prevent a triple.", "isCorrect": false },
+      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
+    ],
+    "explanation": "With a runner on first and no outs, preventing the runner from advancing to second is crucial. A strong, accurate throw to second base is the priority, as it keeps the runner from being in scoring position."
+  },
+  {
+    "id": "lf-line-drive-runner-on-2nd-1out",
+    "positionFocus": ["LF"],
+    "baseRunners": { "first": false, "second": true, "third": false },
+    "outs": 1,
+    "ballLocation": { "x": 80, "y": 80 },
+    "situation": "Runner on 2nd, 1 out. A line drive is hit to you in left field.",
+    "question": "What's your priority after fielding the ball?",
+    "options": [
+      { "text": "Make a strong throw to third base to prevent the runner from advancing.", "isCorrect": true },
+      { "text": "Throw to second base to keep the runner from advancing.", "isCorrect": false },
+      { "text": "Throw to first base to get the batter.", "isCorrect": false },
+      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
+    ],
+    "explanation": "With a runner on second and one out, preventing the runner from advancing to third is crucial. A strong, accurate throw to third base is the priority, as it keeps the runner from being in scoring position."
+  },
+  {
+    "id": "cf-flyball-runner-on-1st-0outs",
+    "positionFocus": ["CF"],
+    "baseRunners": { "first": true, "second": false, "third": false },
+    "outs": 0,
+    "ballLocation": { "x": 200, "y": 30 },
+    "situation": "Runner on 1st, 0 outs. A deep fly ball is hit to you in center field.",
+    "question": "What's your priority after catching the ball?",
+    "options": [
+      { "text": "Make a strong throw to second base to prevent the runner from advancing.", "isCorrect": true },
+      { "text": "Throw to first base to get the batter.", "isCorrect": false },
+      { "text": "Throw to third base to prevent a triple.", "isCorrect": false },
+      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
+    ],
+    "explanation": "With a runner on first and no outs, preventing the runner from advancing to second is crucial. A strong, accurate throw to second base is the priority, as it keeps the runner from being in scoring position."
+  },
+  {
+    "id": "p-bunt-runner-on-1st-0outs",
+    "positionFocus": ["P", "1B", "3B"],
+    "baseRunners": { "first": true, "second": false, "third": false },
+    "outs": 0,
+    "ballLocation": { "x": 200, "y": 200 },
+    "situation": "Runner on 1st, 0 outs. A bunt is laid down in front of the plate.",
+    "question": "What's your priority after fielding the ball?",
+    "options": [
+      { "text": "Throw to second base to get the lead runner.", "isCorrect": true },
+      { "text": "Throw to first base to get the batter.", "isCorrect": false },
+      { "text": "Hold the ball and check the runner's position.", "isCorrect": false },
+      { "text": "Throw to third base to prevent a triple.", "isCorrect": false }
+    ],
+    "explanation": "With a runner on first and no outs, getting the lead runner at second is the priority. A quick, accurate throw to second base is crucial, as it prevents the runner from being in scoring position."
+  },
+  {
+    "id": "c-passed-ball-runner-on-2nd-1out",
+    "positionFocus": ["C", "P"],
+    "baseRunners": { "first": false, "second": true, "third": false },
+    "outs": 1,
+    "ballLocation": { "x": 200, "y": 320 },
+    "situation": "Runner on 2nd, 1 out. The pitch gets by you (passed ball) and rolls towards the backstop.",
+    "question": "What's your immediate action?",
+    "options": [
+      { "text": "Scramble back quickly, locate the ball, and if the runner is going, throw to the pitcher covering home.", "isCorrect": true },
+      { "text": "Yell for the pitcher to get the ball.", "isCorrect": false },
+      { "text": "Assume the runner will score and wait for the next pitch.", "isCorrect": false },
+      { "text": "Throw to 2nd base to see if the runner is off the bag.", "isCorrect": false }
+    ],
+    "explanation": "The catcher's primary responsibility on a passed ball with a runner on second is to retrieve the ball as quickly as possible and make a play at the plate if the runner attempts to score. The pitcher should be covering home plate."
+  },
+  {
+    "id": "c-steal-2nd-runner-on-1st-1out",
+    "positionFocus": ["C"],
+    "baseRunners": { "first": true, "second": false, "third": false },
+    "outs": 1,
+    "ballLocation": { "x": 200, "y": 320 },
+    "situation": "Runner on 1st, 1 out. The runner takes off for second base on the pitch.",
+    "question": "What's your immediate action?",
+    "options": [
+      { "text": "Pop up quickly, make a strong throw to second base, aiming for the shortstop covering the bag.", "isCorrect": true },
+      { "text": "Hold the ball and check other runners.", "isCorrect": false },
+      { "text": "Throw to first base to keep the runner close.", "isCorrect": false },
+      { "text": "Wait for the pitch to be called before throwing.", "isCorrect": false }
+    ],
+    "explanation": "In youth baseball, quick, accurate throws are crucial. Pop up quickly and make a strong throw to second base. The shortstop should be covering the bag on a steal attempt."
+  },
+  {
+    "id": "ss-steal-3rd-runner-on-2nd-0outs",
+    "positionFocus": ["SS"],
+    "baseRunners": { "first": false, "second": true, "third": false },
+    "outs": 0,
+    "ballLocation": { "x": 200, "y": 320 },
+    "situation": "Runner on 2nd, 0 outs. The runner takes off for third base on the pitch.",
+    "question": "What should you do?",
+    "options": [
+      { "text": "Cover third base and be ready to receive the throw from the catcher.", "isCorrect": true },
+      { "text": "Stay at shortstop and let the third baseman handle it.", "isCorrect": false },
+      { "text": "Run towards second base to back up the throw.", "isCorrect": false },
+      { "text": "Stay in position and watch the play.", "isCorrect": false }
+    ],
+    "explanation": "In youth baseball, the shortstop should cover third base on steal attempts. This provides a better angle for the throw from the catcher and helps prevent the runner from advancing."
+  },
+  {
+    "id": "rf-deep-fly-cutoff-runner-on-1st-0outs",
+    "positionFocus": ["RF"],
+    "baseRunners": { "first": true, "second": false, "third": false },
+    "outs": 0,
+    "ballLocation": { "x": 320, "y": 80 },
+    "situation": "Runner on 1st, 0 outs. A deep fly ball is hit to you in right field.",
+    "question": "After catching the ball, what's your priority?",
+    "options": [
+      { "text": "Make a strong throw to the cutoff man (second baseman) to prevent the runner from advancing to third.", "isCorrect": true },
+      { "text": "Throw directly to second base.", "isCorrect": false },
+      { "text": "Throw to first base to get the batter.", "isCorrect": false },
+      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
+    ],
+    "explanation": "In youth baseball, hitting the cutoff man is crucial. The second baseman should be positioned as the cutoff man, ready to relay the throw to the appropriate base."
+  },
+  {
+    "id": "2b-cutoff-deep-fly-runner-on-2nd-1out",
+    "positionFocus": ["2B"],
+    "baseRunners": { "first": false, "second": true, "third": false },
+    "outs": 1,
+    "ballLocation": { "x": 320, "y": 80 },
+    "situation": "Runner on 2nd, 1 out. A deep fly ball is hit to right field.",
+    "question": "What should you do?",
+    "options": [
+      { "text": "Position yourself as the cutoff man between right field and third base, ready to relay the throw.", "isCorrect": true },
+      { "text": "Cover second base.", "isCorrect": false },
+      { "text": "Run to right field to help.", "isCorrect": false },
+      { "text": "Stay at second base and watch the play.", "isCorrect": false }
+    ],
+    "explanation": "In youth baseball, the second baseman should position themselves as the cutoff man on deep fly balls to right field. This helps prevent the runner from advancing to third base."
+  },
+  {
+    "id": "ss-cutoff-deep-fly-runner-on-1st-0outs",
+    "positionFocus": ["SS"],
+    "baseRunners": { "first": true, "second": false, "third": false },
+    "outs": 0,
+    "ballLocation": { "x": 80, "y": 80 },
+    "situation": "Runner on 1st, 0 outs. A deep fly ball is hit to left field.",
+    "question": "What should you do?",
+    "options": [
+      { "text": "Position yourself as the cutoff man between left field and third base, ready to relay the throw.", "isCorrect": true },
+      { "text": "Cover second base.", "isCorrect": false },
+      { "text": "Run to left field to help.", "isCorrect": false },
+      { "text": "Stay at shortstop and watch the play.", "isCorrect": false }
+    ],
+    "explanation": "In youth baseball, the shortstop should position themselves as the cutoff man on deep fly balls to left field. This helps prevent the runner from advancing to third base."
+  },
+  {
+    "id": "cf-deep-fly-cutoff-runner-on-2nd-1out",
+    "positionFocus": ["CF"],
+    "baseRunners": { "first": false, "second": true, "third": false },
+    "outs": 1,
+    "ballLocation": { "x": 200, "y": 30 },
+    "situation": "Runner on 2nd, 1 out. A deep fly ball is hit to you in center field.",
+    "question": "After catching the ball, what's your priority?",
+    "options": [
+      { "text": "Make a strong throw to the cutoff man (shortstop) to prevent the runner from advancing to third.", "isCorrect": true },
+      { "text": "Throw directly to third base.", "isCorrect": false },
+      { "text": "Throw to second base to keep the runner from advancing.", "isCorrect": false },
+      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
+    ],
+    "explanation": "In youth baseball, hitting the cutoff man is crucial. The shortstop should be positioned as the cutoff man, ready to relay the throw to the appropriate base."
+  },
+  {
+    "id": "3b-steal-home-runner-on-3rd-2outs",
+    "positionFocus": ["3B"],
+    "baseRunners": { "first": false, "second": false, "third": true },
+    "outs": 2,
+    "ballLocation": { "x": 120, "y": 180 },
+    "situation": "Runner on 3rd, 2 outs. The runner takes off for home on the pitch.",
+    "question": "What should you do?",
+    "options": [
+      { "text": "Cover third base in case the runner retreats, and be ready to receive a throw from the catcher.", "isCorrect": true },
+      { "text": "Run to home plate to help.", "isCorrect": false },
+      { "text": "Stay at third base and watch the play.", "isCorrect": false },
+      { "text": "Run to second base to back up the throw.", "isCorrect": false }
+    ],
+    "explanation": "In youth baseball, the third baseman should cover third base on steal attempts. This provides a better angle for the throw from the catcher and helps prevent the runner from advancing."
+  },
+  {
+    "id": "lf-deep-fly-cutoff-runner-on-1st-1out",
+    "positionFocus": ["LF"],
+    "baseRunners": { "first": true, "second": false, "third": false },
+    "outs": 1,
+    "ballLocation": { "x": 80, "y": 80 },
+    "situation": "Runner on 1st, 1 out. A deep fly ball is hit to you in left field.",
+    "question": "After catching the ball, what's your priority?",
+    "options": [
+      { "text": "Make a strong throw to the cutoff man (shortstop) to prevent the runner from advancing to third.", "isCorrect": true },
+      { "text": "Throw directly to second base.", "isCorrect": false },
+      { "text": "Throw to first base to get the batter.", "isCorrect": false },
+      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
+    ],
+    "explanation": "In youth baseball, hitting the cutoff man is crucial. The shortstop should be positioned as the cutoff man, ready to relay the throw to the appropriate base."
+  },
+  {
+    "id": "ss-deep-fly-cutoff-runner-on-2nd-1out",
+    "positionFocus": ["SS"],
+    "baseRunners": { "first": false, "second": true, "third": false },
+    "outs": 1,
+    "ballLocation": { "x": 200, "y": 30 },
+    "situation": "Runner on 2nd, 1 out. A deep fly ball is hit to center field.",
+    "question": "What should you do?",
+    "options": [
+      { "text": "Position yourself as the cutoff man between center field and third base, ready to relay the throw.", "isCorrect": true },
+      { "text": "Cover second base.", "isCorrect": false },
+      { "text": "Run to center field to help.", "isCorrect": false },
+      { "text": "Stay at shortstop and watch the play.", "isCorrect": false }
+    ],
+    "explanation": "In youth baseball, the shortstop should position themselves as the cutoff man on deep fly balls to center field. This helps prevent the runner from advancing to third base."
+  },
+  {
+    "id": "ss-bunt-runner-on-1st-0outs",
+    "positionFocus": ["SS"],
+    "baseRunners": { "first": true, "second": false, "third": false },
+    "outs": 0,
+    "ballLocation": { "x": 200, "y": 250 },
+    "situation": "Runner on 1st, 0 outs. A bunt is laid down in front of the plate.",
+    "question": "What should you do?",
+    "options": [
+      { "text": "Cover second base to receive the throw from the pitcher or catcher.", "isCorrect": true },
+      { "text": "Run to first base to help.", "isCorrect": false },
+      { "text": "Stay at shortstop and watch the play.", "isCorrect": false },
+      { "text": "Run to third base to prevent advancement.", "isCorrect": false }
+    ],
+    "explanation": "On a bunt with a runner on first, the shortstop should cover second base to receive the throw from the pitcher or catcher. This helps prevent the runner from advancing to second."
+  },
+  {
+    "id": "ss-deep-fly-cutoff-runner-on-1st-0outs",
+    "positionFocus": ["SS"],
+    "baseRunners": { "first": true, "second": false, "third": false },
+    "outs": 0,
+    "ballLocation": { "x": 80, "y": 80 },
+    "situation": "Runner on 1st, 0 outs. A deep fly ball is hit to left field.",
+    "question": "What should you do?",
+    "options": [
+      { "text": "Position yourself as the cutoff man between left field and third base, ready to relay the throw.", "isCorrect": true },
+      { "text": "Cover second base.", "isCorrect": false },
+      { "text": "Run to left field to help.", "isCorrect": false },
+      { "text": "Stay at shortstop and watch the play.", "isCorrect": false }
+    ],
+    "explanation": "In youth baseball, the shortstop should position themselves as the cutoff man on deep fly balls to left field. This helps prevent the runner from advancing to third base."
+  },
+  {
+    "id": "1b-bunt-runner-on-1st-0outs",
+    "positionFocus": ["1B"],
+    "baseRunners": { "first": true, "second": false, "third": false },
+    "outs": 0,
+    "ballLocation": { "x": 200, "y": 200 },
+    "situation": "Runner on 1st, 0 outs. A bunt is laid down in front of the plate.",
+    "question": "What should you do?",
+    "options": [
+      { "text": "Charge in to field the bunt, then throw to second base to get the lead runner.", "isCorrect": true },
+      { "text": "Stay at first base and wait for the throw.", "isCorrect": false },
+      { "text": "Run to home plate to help.", "isCorrect": false },
+      { "text": "Stay at first base and watch the play.", "isCorrect": false }
+    ],
+    "explanation": "On a bunt with a runner on first, the first baseman should charge in to field the bunt. This helps prevent the runner from advancing to second."
+  },
+  {
+    "id": "1b-popup-runner-on-1st-1out",
+    "positionFocus": ["1B"],
+    "baseRunners": { "first": true, "second": false, "third": false },
+    "outs": 1,
+    "ballLocation": { "x": 280, "y": 220 },
+    "situation": "Runner on 1st, 1 out. A pop-up is hit to you in foul territory.",
+    "question": "What should you do?",
+    "options": [
+      { "text": "Call for the ball loudly and make the catch if you can reach it.", "isCorrect": true },
+      { "text": "Let the catcher catch it since it's in foul territory.", "isCorrect": false },
+      { "text": "Let the pitcher catch it.", "isCorrect": false },
+      { "text": "Stay at first base and watch the play.", "isCorrect": false }
+    ],
+    "explanation": "As the first baseman, you have priority on pop-ups in foul territory you can reach. Clear communication is key. Call for the ball loudly if you can make the play."
+  },
+  {
+    "id": "1b-grounder-runner-on-2nd-1out",
+    "positionFocus": ["1B"],
+    "baseRunners": { "first": false, "second": true, "third": false },
+    "outs": 1,
+    "ballLocation": { "x": 280, "y": 220 },
+    "situation": "Runner on 2nd, 1 out. A ground ball is hit to you.",
+    "question": "What should you do?",
+    "options": [
+      { "text": "Field the ball and throw to third base to prevent the runner from advancing.", "isCorrect": true },
+      { "text": "Field the ball and throw to second base.", "isCorrect": false },
+      { "text": "Field the ball and throw to first base.", "isCorrect": false },
+      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
+    ],
+    "explanation": "With a runner on second and one out, preventing the runner from advancing to third is crucial. A strong, accurate throw to third base is the priority, as it keeps the runner from being in scoring position."
+  },
+  {
+    "id": "1b-grounder-runner-on-3rd-2outs",
+    "positionFocus": ["1B"],
+    "baseRunners": { "first": false, "second": false, "third": true },
+    "outs": 2,
+    "ballLocation": { "x": 280, "y": 220 },
+    "situation": "Runner on 3rd, 2 outs. A ground ball is hit to you.",
+    "question": "What should you do?",
+    "options": [
+      { "text": "Field the ball and throw to home plate to prevent the runner from scoring.", "isCorrect": true },
+      { "text": "Field the ball and throw to third base.", "isCorrect": false },
+      { "text": "Field the ball and throw to first base.", "isCorrect": false },
+      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
+    ],
+    "explanation": "With a runner on third and two outs, preventing the runner from scoring is the top priority. A strong, accurate throw to home plate is crucial, as it could be the final out of the inning."
+  },
+  {
+    "id": "2b-grounder-runner-on-1st-0outs",
+    "positionFocus": ["2B"],
+    "baseRunners": { "first": true, "second": false, "third": false },
+    "outs": 0,
+    "ballLocation": { "x": 220, "y": 180 },
+    "situation": "Runner on 1st, 0 outs. A ground ball is hit to you.",
+    "question": "What is your primary objective for a double play?",
+    "options": [
+      { "text": "Get the force out at 2nd, then throw to 1st.", "isCorrect": true },
+      { "text": "Tag the runner going to 2nd, then throw to 1st.", "isCorrect": false },
+      { "text": "Throw to 1st immediately.", "isCorrect": false },
+      { "text": "Throw to 3rd to prevent advancement.", "isCorrect": false }
+    ],
+    "explanation": "With a runner on 1st and less than two outs, a ground ball to the second baseman is a classic 4-6-3 double play. Secure the out at 2nd (force play) first."
+  },
+  {
+    "id": "2b-bunt-runner-on-1st-0outs",
+    "positionFocus": ["2B"],
+    "baseRunners": { "first": true, "second": false, "third": false },
+    "outs": 0,
+    "ballLocation": { "x": 200, "y": 200 },
+    "situation": "Runner on 1st, 0 outs. A bunt is laid down in front of the plate.",
+    "question": "What should you do?",
+    "options": [
+      { "text": "Cover second base to receive the throw from the pitcher or catcher.", "isCorrect": true },
+      { "text": "Run to first base to help.", "isCorrect": false },
+      { "text": "Stay at second base and watch the play.", "isCorrect": false },
+      { "text": "Run to third base to prevent advancement.", "isCorrect": false }
+    ],
+    "explanation": "On a bunt with a runner on first, the second baseman should cover second base to receive the throw from the pitcher or catcher. This helps prevent the runner from advancing to second."
+  },
+  {
+    "id": "2b-popup-runner-on-1st-1out",
+    "positionFocus": ["2B"],
+    "baseRunners": { "first": true, "second": false, "third": false },
+    "outs": 1,
+    "ballLocation": { "x": 220, "y": 180 },
+    "situation": "Runner on 1st, 1 out. A pop-up is hit to you in shallow right field.",
+    "question": "What should you do?",
+    "options": [
+      { "text": "Call for the ball loudly and make the catch if you can reach it.", "isCorrect": true },
+      { "text": "Let the right fielder catch it since it's in the outfield.", "isCorrect": false },
+      { "text": "Let the pitcher catch it.", "isCorrect": false },
+      { "text": "Stay at second base and watch the play.", "isCorrect": false }
+    ],
+    "explanation": "As the second baseman, you have priority on pop-ups in shallow right field you can reach. Clear communication is key. Call for the ball loudly if you can make the play."
+  },
+  {
+    "id": "2b-grounder-runner-on-2nd-1out",
+    "positionFocus": ["2B"],
+    "baseRunners": { "first": false, "second": true, "third": false },
+    "outs": 1,
+    "ballLocation": { "x": 220, "y": 180 },
+    "situation": "Runner on 2nd, 1 out. A ground ball is hit to you.",
+    "question": "What should you do?",
+    "options": [
+      { "text": "Field the ball and throw to third base to prevent the runner from advancing.", "isCorrect": true },
+      { "text": "Field the ball and throw to second base.", "isCorrect": false },
+      { "text": "Field the ball and throw to first base.", "isCorrect": false },
+      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
+    ],
+    "explanation": "With a runner on second and one out, preventing the runner from advancing to third is crucial. A strong, accurate throw to third base is the priority, as it keeps the runner from being in scoring position."
+  },
+  {
+    "id": "2b-grounder-runner-on-3rd-2outs",
+    "positionFocus": ["2B"],
+    "baseRunners": { "first": false, "second": false, "third": true },
+    "outs": 2,
+    "ballLocation": { "x": 220, "y": 180 },
+    "situation": "Runner on 3rd, 2 outs. A ground ball is hit to you.",
+    "question": "What should you do?",
+    "options": [
+      { "text": "Field the ball and throw to home plate to prevent the runner from scoring.", "isCorrect": true },
+      { "text": "Field the ball and throw to third base.", "isCorrect": false },
+      { "text": "Field the ball and throw to first base.", "isCorrect": false },
+      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
+    ],
+    "explanation": "With a runner on third and two outs, preventing the runner from scoring is the top priority. A strong, accurate throw to home plate is crucial, as it could be the final out of the inning."
+  },
+  {
+    "id": "3b-bunt-runner-on-1st-0outs",
+    "positionFocus": ["3B"],
+    "baseRunners": { "first": true, "second": false, "third": false },
+    "outs": 0,
+    "ballLocation": { "x": 200, "y": 200 },
+    "situation": "Runner on 1st, 0 outs. A bunt is laid down in front of the plate.",
+    "question": "What should you do?",
+    "options": [
+      { "text": "Charge in to field the bunt, then throw to second base to get the lead runner.", "isCorrect": true },
+      { "text": "Stay at third base and wait for the throw.", "isCorrect": false },
+      { "text": "Run to home plate to help.", "isCorrect": false },
+      { "text": "Stay at third base and watch the play.", "isCorrect": false }
+    ],
+    "explanation": "On a bunt with a runner on first, the third baseman should charge in to field the bunt. This helps prevent the runner from advancing to second."
+  },
+  {
+    "id": "3b-popup-runner-on-1st-1out",
+    "positionFocus": ["3B"],
+    "baseRunners": { "first": true, "second": false, "third": false },
+    "outs": 1,
+    "ballLocation": { "x": 120, "y": 180 },
+    "situation": "Runner on 1st, 1 out. A pop-up is hit to you in foul territory.",
+    "question": "What should you do?",
+    "options": [
+      { "text": "Call for the ball loudly and make the catch if you can reach it.", "isCorrect": true },
+      { "text": "Let the catcher catch it since it's in foul territory.", "isCorrect": false },
+      { "text": "Let the pitcher catch it.", "isCorrect": false },
+      { "text": "Stay at third base and watch the play.", "isCorrect": false }
+    ],
+    "explanation": "As the third baseman, you have priority on pop-ups in foul territory you can reach. Clear communication is key. Call for the ball loudly if you can make the play."
+  },
+  {
+    "id": "3b-grounder-runner-on-2nd-1out",
+    "positionFocus": ["3B"],
+    "baseRunners": { "first": false, "second": true, "third": false },
+    "outs": 1,
+    "ballLocation": { "x": 120, "y": 180 },
+    "situation": "Runner on 2nd, 1 out. A ground ball is hit to you.",
+    "question": "What should you do?",
+    "options": [
+      { "text": "Field the ball and throw to first base to get the batter-runner.", "isCorrect": true },
+      { "text": "Field the ball and throw to second base.", "isCorrect": false },
+      { "text": "Field the ball and throw to third base.", "isCorrect": false },
+      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
+    ],
+    "explanation": "With a runner on second and one out, getting the batter-runner at first is the priority. A strong, accurate throw to first base is crucial, as it keeps the runner from being in scoring position."
+  },
+  {
+    "id": "3b-grounder-runner-on-3rd-2outs",
+    "positionFocus": ["3B"],
+    "baseRunners": { "first": false, "second": false, "third": true },
+    "outs": 2,
+    "ballLocation": { "x": 120, "y": 180 },
+    "situation": "Runner on 3rd, 2 outs. A ground ball is hit to you.",
+    "question": "What should you do?",
+    "options": [
+      { "text": "Field the ball and throw to first base to get the batter-runner.", "isCorrect": true },
+      { "text": "Field the ball and throw to third base.", "isCorrect": false },
+      { "text": "Field the ball and throw to home plate.", "isCorrect": false },
+      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
+    ],
+    "explanation": "With a runner on third and two outs, getting the batter-runner at first is the top priority. A strong, accurate throw to first base is crucial, as it could be the final out of the inning."
+  },
+  {
+    "id": "cf-flyball-runner-on-2nd-1out",
+    "positionFocus": ["CF"],
+    "baseRunners": { "first": false, "second": true, "third": false },
+    "outs": 1,
+    "ballLocation": { "x": 200, "y": 30 },
+    "situation": "Runner on 2nd, 1 out. A deep fly ball is hit to you in center field.",
+    "question": "What's your priority after catching the ball?",
+    "options": [
+      { "text": "Make a strong throw to third base to prevent the runner from advancing.", "isCorrect": true },
+      { "text": "Throw to second base to keep the runner from advancing.", "isCorrect": false },
+      { "text": "Throw to first base to get the batter.", "isCorrect": false },
+      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
+    ],
+    "explanation": "With a runner on second and one out, preventing the runner from advancing to third is crucial. A strong, accurate throw to third base is the priority, as it keeps the runner from being in scoring position."
+  },
+  {
+    "id": "cf-flyball-runner-on-3rd-2outs",
+    "positionFocus": ["CF"],
+    "baseRunners": { "first": false, "second": false, "third": true },
+    "outs": 2,
+    "ballLocation": { "x": 200, "y": 30 },
+    "situation": "Runner on 3rd, 2 outs. A deep fly ball is hit to you in center field.",
+    "question": "What's your priority after catching the ball?",
+    "options": [
+      { "text": "Make a strong throw to home plate to prevent the runner from scoring.", "isCorrect": true },
+      { "text": "Throw to third base to keep the runner from advancing.", "isCorrect": false },
+      { "text": "Throw to second base to prevent a double.", "isCorrect": false },
+      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
+    ],
+    "explanation": "With a runner on third and two outs, preventing the runner from scoring is the top priority. A strong, accurate throw to home plate is crucial, as it could be the final out of the inning."
+  },
+  {
+    "id": "cf-line-drive-runner-on-1st-0outs",
+    "positionFocus": ["CF"],
+    "baseRunners": { "first": true, "second": false, "third": false },
+    "outs": 0,
+    "ballLocation": { "x": 200, "y": 30 },
+    "situation": "Runner on 1st, 0 outs. A line drive is hit to you in center field.",
+    "question": "What's your priority after fielding the ball?",
+    "options": [
+      { "text": "Make a strong throw to second base to prevent the runner from advancing.", "isCorrect": true },
+      { "text": "Throw to first base to get the batter.", "isCorrect": false },
+      { "text": "Throw to third base to prevent a triple.", "isCorrect": false },
+      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
+    ],
+    "explanation": "With a runner on first and no outs, preventing the runner from advancing to second is crucial. A strong, accurate throw to second base is the priority, as it keeps the runner from being in scoring position."
+  },
+  {
+    "id": "cf-line-drive-runner-on-2nd-1out",
+    "positionFocus": ["CF"],
+    "baseRunners": { "first": false, "second": true, "third": false },
+    "outs": 1,
+    "ballLocation": { "x": 200, "y": 30 },
+    "situation": "Runner on 2nd, 1 out. A line drive is hit to you in center field.",
+    "question": "What's your priority after fielding the ball?",
+    "options": [
+      { "text": "Make a strong throw to third base to prevent the runner from advancing.", "isCorrect": true },
+      { "text": "Throw to second base to keep the runner from advancing.", "isCorrect": false },
+      { "text": "Throw to first base to get the batter.", "isCorrect": false },
+      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
+    ],
+    "explanation": "With a runner on second and one out, preventing the runner from advancing to third is crucial. A strong, accurate throw to third base is the priority, as it keeps the runner from being in scoring position."
+  },
+  {
+    "id": "c-steal-2nd-runner-on-1st-1out",
+    "positionFocus": ["C"],
+    "baseRunners": { "first": true, "second": false, "third": false },
+    "outs": 1,
+    "ballLocation": { "x": 200, "y": 320 },
+    "situation": "Runner on 1st, 1 out. The runner takes off for second base on the pitch.",
+    "question": "What's your immediate action?",
+    "options": [
+      { "text": "Pop up quickly, make a strong throw to second base, aiming for the shortstop covering the bag.", "isCorrect": true },
+      { "text": "Hold the ball and check other runners.", "isCorrect": false },
+      { "text": "Throw to first base to keep the runner close.", "isCorrect": false },
+      { "text": "Wait for the pitch to be called before throwing.", "isCorrect": false }
+    ],
+    "explanation": "In youth baseball, quick, accurate throws are crucial. Pop up quickly and make a strong throw to second base. The shortstop should be covering the bag on a steal attempt."
+  },
+  {
+    "id": "c-bunt-runner-on-1st-0outs",
+    "positionFocus": ["C"],
+    "baseRunners": { "first": true, "second": false, "third": false },
+    "outs": 0,
+    "ballLocation": { "x": 200, "y": 250 },
+    "situation": "Runner on 1st, 0 outs. A bunt is laid down in front of the plate.",
+    "question": "What should you do?",
+    "options": [
+      { "text": "Charge out quickly, field the bunt, and throw to second base to get the lead runner.", "isCorrect": true },
+      { "text": "Stay at home plate and wait for the throw.", "isCorrect": false },
+      { "text": "Let the pitcher field it.", "isCorrect": false },
+      { "text": "Stay at home plate and watch the play.", "isCorrect": false }
+    ],
+    "explanation": "On a bunt with a runner on first, the catcher should charge out quickly to field the bunt. This helps prevent the runner from advancing to second."
+  },
+  {
+    "id": "c-popup-runner-on-1st-1out",
+    "positionFocus": ["C"],
+    "baseRunners": { "first": true, "second": false, "third": false },
+    "outs": 1,
+    "ballLocation": { "x": 200, "y": 320 },
+    "situation": "Runner on 1st, 1 out. A pop-up is hit to you in foul territory.",
+    "question": "What should you do?",
+    "options": [
+      { "text": "Call for the ball loudly and make the catch if you can reach it.", "isCorrect": true },
+      { "text": "Let the first baseman catch it since it's in foul territory.", "isCorrect": false },
+      { "text": "Let the pitcher catch it.", "isCorrect": false },
+      { "text": "Stay at home plate and watch the play.", "isCorrect": false }
+    ],
+    "explanation": "As the catcher, you have priority on pop-ups in foul territory you can reach. Clear communication is key. Call for the ball loudly if you can make the play."
+  },
+  {
+    "id": "c-grounder-runner-on-3rd-2outs",
+    "positionFocus": ["C"],
+    "baseRunners": { "first": false, "second": false, "third": true },
+    "outs": 2,
+    "ballLocation": { "x": 200, "y": 320 },
+    "situation": "Runner on 3rd, 2 outs. A ground ball is hit to you.",
+    "question": "What should you do?",
+    "options": [
+      { "text": "Field the ball and throw to first base to get the batter-runner.", "isCorrect": true },
+      { "text": "Field the ball and throw to third base.", "isCorrect": false },
+      { "text": "Field the ball and throw to home plate.", "isCorrect": false },
+      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
+    ],
+    "explanation": "With a runner on third and two outs, getting the batter-runner at first is the top priority. A strong, accurate throw to first base is crucial, as it could be the final out of the inning."
   }
 ]; 
