@@ -19,15 +19,15 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install Dependencies
         run: |
-          yarn install --frozen-lockfile
+          npm ci
 
       - name: Build
         run: |
-          yarn build
+          npm run build
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
