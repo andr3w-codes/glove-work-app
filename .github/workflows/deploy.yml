@@ -21,10 +21,12 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
-      - name: Install Dependencies
+      - name: Clean Install Dependencies
         run: |
-          npm install
-          npm install @vitejs/plugin-react vite --save-dev
+          rm -rf node_modules
+          rm -f package-lock.json
+          npm cache clean --force
+          npm ci
 
       - name: Build
         run: |
