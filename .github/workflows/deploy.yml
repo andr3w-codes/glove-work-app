@@ -21,12 +21,9 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
-      - name: Clean Install Dependencies
+      - name: Install Dependencies
         run: |
-          rm -rf node_modules
-          rm -f package-lock.json
-          npm cache clean --force
-          npm ci
+          npm install --no-audit --no-fund --loglevel=error
 
       - name: Build
         run: |
