@@ -1,5 +1,7 @@
 name: Deploy to GitHub Pages
 
+# Triggered on push to main branch
+# Re-running after making repository public
 on:
   push:
     branches:
