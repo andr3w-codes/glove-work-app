@@ -23,11 +23,12 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          npm install --legacy-peer-deps
+          npm install vite@4.4.5 --save-dev
+          npm install
 
       - name: Build
         run: |
-          npx vite build
+          ./node_modules/.bin/vite build
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
