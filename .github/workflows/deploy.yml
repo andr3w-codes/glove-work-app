@@ -19,16 +19,15 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'npm'
+          cache: 'yarn'
 
       - name: Install Dependencies
         run: |
-          npm install vite@4.4.5 --save-dev
-          npm install
+          yarn install --frozen-lockfile
 
       - name: Build
         run: |
-          ./node_modules/.bin/vite build
+          yarn build
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
