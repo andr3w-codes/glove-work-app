@@ -20,6 +20,7 @@ jobs:
         with:
           node-version: '16.20.2'
           cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Clear npm cache
         run: |
@@ -27,7 +28,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          npm install --no-audit --no-fund --verbose || (echo "npm install failed" && npm cache verify && exit 1)
+          npm install --no-audit --no-fund --verbose --registry=https://registry.npmjs.org/ || (echo "npm install failed" && npm cache verify && exit 1)
 
       - name: Build
         run: |
