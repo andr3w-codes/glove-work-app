@@ -24,10 +24,11 @@ jobs:
       - name: Install Dependencies
         run: |
           npm install
-          npm install -g vite
+          npm install @vitejs/plugin-react vite --save-dev
 
       - name: Build
-        run: npm run build
+        run: |
+          npm run build
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
