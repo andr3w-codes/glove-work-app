@@ -1,15 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import BaseRunnerDiagram from './BaseRunnerDiagram';
 
+// Helper function to shuffle an array
+function shuffleArray(array) {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
+}
+
 function Flashcard({ scenario, onNextScenario, onAnswer, currentScore, totalScenarios, currentIndex, selectedPosition }) {
   const [showExplanation, setShowExplanation] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [shuffledOptions, setShuffledOptions] = useState([]);
 
   useEffect(() => {
     setShowExplanation(false);
     setSelectedOption(null);
     setIsTransitioning(true);
+    // Shuffle options when scenario changes
+    setShuffledOptions(shuffleArray(scenario.options));
     const timer = setTimeout(() => setIsTransitioning(false), 300);
     return () => clearTimeout(timer);
   }, [scenario]);
@@ -35,7 +48,8 @@ function Flashcard({ scenario, onNextScenario, onAnswer, currentScore, totalScen
     }, 300);
   };
 
-  const { situation, question, options, explanation, baseRunners, outs, ballLocation } = scenario;
+  const { situation, question, explanation, baseRunners, outs, ballLocation } = scenario;
+  const isLastQuestion = currentIndex + 1 >= totalScenarios;
   const progress = ((currentIndex + 1) / totalScenarios) * 100;
 
   return (
@@ -76,7 +90,7 @@ function Flashcard({ scenario, onNextScenario, onAnswer, currentScore, totalScen
         </div>
 
         <div className="space-y-4 mb-8">
-          {options.map((option, index) => {
+          {shuffledOptions.map((option, index) => {
             let buttonClass = "w-full text-left p-4 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200 transform hover:scale-[1.02]";
             if (showExplanation && selectedOption && selectedOption.index === index) {
               buttonClass += option.isCorrect 
@@ -119,7 +133,7 @@ function Flashcard({ scenario, onNextScenario, onAnswer, currentScore, totalScen
               onClick={handleNext}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-200 transform hover:scale-[1.02]"
             >
-              {currentIndex + 1 === totalScenarios ? 'Finish' : 'Next Scenario'}
+              {isLastQuestion ? 'Finish' : 'Next Scenario'}
             </button>
           </div>
         )}

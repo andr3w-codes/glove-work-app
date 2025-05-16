@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
-function BaseRunnerDiagram({ baseRunners, outs, ballLocation }) {
+function BaseRunnerDiagram({ baseRunners, outs, ballLocation, onBallLocationSelect, isInteractive = false }) {
   const [showBall, setShowBall] = useState(false);
-  const [ballPosition, setBallPosition] = useState({ x: 200, y: 300 }); // Start at home plate
+  const [ballPosition, setBallPosition] = useState(ballLocation || { x: 200, y: 300 });
   const [isTraveling, setIsTraveling] = useState(false);
+  const svgRef = useRef(null);
 
   useEffect(() => {
-    if (ballLocation) {
+    if (ballLocation && !isInteractive) {
       setShowBall(true);
       setIsTraveling(true);
       setBallPosition({ x: 200, y: 300 }); // Reset to home plate
@@ -40,14 +41,39 @@ function BaseRunnerDiagram({ baseRunners, outs, ballLocation }) {
 
       requestAnimationFrame(animate);
     } else {
-      setShowBall(false);
-      setIsTraveling(false);
+      setShowBall(true);
+      setBallPosition(ballLocation || { x: 200, y: 300 });
     }
-  }, [ballLocation]);
+  }, [ballLocation, isInteractive]);
+
+  const handleClick = (event) => {
+    if (!isInteractive) return;
+    
+    const svg = svgRef.current;
+    const rect = svg.getBoundingClientRect();
+    
+    // Calculate coordinates relative to SVG
+    const x = ((event.clientX - rect.left) / rect.width) * 400;
+    const y = ((event.clientY - rect.top) / rect.height) * 400;
+    
+    const newLocation = { x, y };
+    setBallPosition(newLocation);
+    if (onBallLocationSelect) {
+      onBallLocationSelect(newLocation);
+    }
+  };
 
   return (
     <div className="relative w-64 h-64 mx-auto mb-6">
-      <svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      <svg 
+        ref={svgRef}
+        width="400" 
+        height="400" 
+        viewBox="0 0 400 400" 
+        xmlns="http://www.w3.org/2000/svg" 
+        className={`w-full h-full ${isInteractive ? 'cursor-crosshair' : ''}`}
+        onClick={handleClick}
+      >
         {/* Green field (cone with curved top) */}
         <path d="M200,50 
                  A175,175 0 0,1 375,225 
@@ -83,7 +109,7 @@ function BaseRunnerDiagram({ baseRunners, outs, ballLocation }) {
           <circle cx="100" cy="200" r="8" fill="#3B82F6" stroke="white" strokeWidth="2" />
         )}
 
-        {/* Ball with Travel Animation */}
+        {/* Ball */}
         {showBall && (
           <>
             <circle 
@@ -93,7 +119,7 @@ function BaseRunnerDiagram({ baseRunners, outs, ballLocation }) {
               fill="white" 
               stroke="black" 
               strokeWidth="1.5"
-              className={!isTraveling ? "animate-[bounce_1s_ease-in-out_infinite]" : ""}
+              className={!isTraveling && !isInteractive ? "animate-[bounce_1s_ease-in-out_infinite]" : ""}
             />
             <circle 
               cx={ballPosition.x} 
@@ -101,7 +127,7 @@ function BaseRunnerDiagram({ baseRunners, outs, ballLocation }) {
               r="6" 
               fill="red" 
               stroke="none"
-              className={!isTraveling ? "animate-[bounce_1s_ease-in-out_infinite]" : ""}
+              className={!isTraveling && !isInteractive ? "animate-[bounce_1s_ease-in-out_infinite]" : ""}
             />
           </>
         )}
@@ -120,6 +146,12 @@ function BaseRunnerDiagram({ baseRunners, outs, ballLocation }) {
           ))}
         </div>
       </div>
+
+      {isInteractive && (
+        <div className="mt-2 text-center text-sm text-gray-600">
+          Click anywhere on the field to select ball location
+        </div>
+      )}
     </div>
   );
 }

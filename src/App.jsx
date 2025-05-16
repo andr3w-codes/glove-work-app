@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import PositionSelector from './components/PositionSelector';
 import Flashcard from './components/Flashcard';
-import { scenarios as allScenarios } from './data/scenarios';
+import CustomScenarioForm from './components/CustomScenarioForm';
+import Leaderboard from './components/Leaderboard';
+import RulesAgent from './components/RulesAgent';
+import { scenarios as staticScenarios } from './data/scenarios';
 import { positions } from './data/positions';
 import './App.css';
+import { db } from './db/clientConfig';
 
 const SESSION_LENGTH = 5;
 
@@ -18,12 +22,13 @@ function shuffleArray(array) {
 }
 
 function App() {
-  const [selectedPosition, setSelectedPosition] = useState('');
-  const [filteredScenarios, setFilteredScenarios] = useState([]);
+  const [scenarios, setScenarios] = useState([]);
   const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
-  const [currentPositionName, setCurrentPositionName] = useState('');
   const [score, setScore] = useState(0);
-  const [usedScenarioIds, setUsedScenarioIds] = useState(new Set());
+  const [selectedPosition, setSelectedPosition] = useState(null);
+  const [activeView, setActiveView] = useState('practice');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Session Mode State
   const [isSessionModeActive, setIsSessionModeActive] = useState(false);
@@ -32,54 +37,84 @@ function App() {
   const [sessionScore, setSessionScore] = useState(0);
   const [showSessionResults, setShowSessionResults] = useState(false);
 
+  useEffect(() => {
+    loadScenarios();
+  }, []);
+
+  const loadScenarios = async () => {
+    try {
+      setIsLoading(true);
+      const dbScenarios = await db.getCustomScenarios();
+      console.log('Loaded scenarios:', dbScenarios);
+      setScenarios(dbScenarios);
+      setError(null);
+    } catch (err) {
+      console.error('Error loading scenarios:', err);
+      setError('Failed to load scenarios. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAnswer = (isCorrect) => {
+    if (isCorrect) {
+      setScore(prev => prev + 1);
+    }
+  };
+
+  const handleNextScenario = () => {
+    setCurrentScenarioIndex(prev => (prev + 1) % scenarios.length);
+  };
+
+  const handlePositionSelect = (position) => {
+    console.log('Position selected:', position);
+    setSelectedPosition(position);
+  };
+
   const resetToDefaultView = useCallback(() => {
     setIsSessionModeActive(false);
     setShowSessionResults(false);
     setSessionQuestions([]);
     setCurrentSessionQuestionNum(0);
     setSessionScore(0);
-    setUsedScenarioIds(new Set());
-    if (selectedPosition) {
-      const relevantScenarios = allScenarios.filter(scenario => 
-        scenario.positionFocus.includes(selectedPosition)
-      );
-      setFilteredScenarios(relevantScenarios);
-      setCurrentScenarioIndex(0);
-    }
-  }, [selectedPosition]);
+    setCurrentScenarioIndex(0);
+  }, []);
 
   useEffect(() => {
     if (selectedPosition) {
-      const relevantScenarios = allScenarios.filter(scenario => 
-        scenario.positionFocus.includes(selectedPosition)
-      );
-      setFilteredScenarios(relevantScenarios);
+      console.log('Selected position:', selectedPosition);
+      console.log('All scenarios:', scenarios);
+      const relevantScenarios = scenarios.filter(scenario => {
+        console.log('Checking scenario:', scenario);
+        console.log('Position focus:', scenario.positionFocus);
+        return scenario.positionFocus.includes(selectedPosition);
+      });
+      console.log('Filtered scenarios:', relevantScenarios);
+      // Shuffle the filtered scenarios
+      const shuffledScenarios = shuffleArray(relevantScenarios);
+      setScenarios(shuffledScenarios);
       setCurrentScenarioIndex(0);
       const posName = positions.find(p => p.id === selectedPosition)?.name || selectedPosition;
-      setCurrentPositionName(posName);
       resetToDefaultView();
     } else {
-      setFilteredScenarios([]);
-      setCurrentPositionName('');
+      // When position is null, reload all scenarios
+      loadScenarios();
       resetToDefaultView();
     }
   }, [selectedPosition]);
 
-  const handlePositionChange = (newPosition) => {
-    setSelectedPosition(newPosition);
-  };
-
   const getUnusedScenarios = useCallback(() => {
-    return filteredScenarios.filter(scenario => !usedScenarioIds.has(scenario.id));
-  }, [filteredScenarios, usedScenarioIds]);
+    return scenarios.filter(scenario => !sessionQuestions.some(q => q.id === scenario.id));
+  }, [scenarios, sessionQuestions]);
 
   const startSession = () => {
     const unusedScenarios = getUnusedScenarios();
+    console.log('Unused scenarios:', unusedScenarios);
     if (unusedScenarios.length === 0) {
       alert("You've completed all available scenarios for this position! Starting over with all scenarios.");
-      setUsedScenarioIds(new Set());
-      const shuffled = shuffleArray(filteredScenarios);
-      setSessionQuestions(shuffled.slice(0, SESSION_LENGTH));
+      setSessionQuestions([]);
+      const shuffled = shuffleArray(scenarios);
+      setSessionQuestions(shuffled.slice(0, Math.min(SESSION_LENGTH, shuffled.length)));
     } else if (unusedScenarios.length < SESSION_LENGTH) {
       alert(`Only ${unusedScenarios.length} new scenarios remaining. Starting a shorter session.`);
       const shuffled = shuffleArray(unusedScenarios);
@@ -101,33 +136,211 @@ function App() {
   };
 
   const handleNextQuestionInSession = () => {
-    if (currentSessionQuestionNum < sessionQuestions.length) {
-      // Mark the current scenario as used
-      const currentScenario = sessionQuestions[currentSessionQuestionNum - 1];
-      setUsedScenarioIds(prev => new Set([...prev, currentScenario.id]));
-      setCurrentSessionQuestionNum(prevNum => prevNum + 1);
-    } else {
+    console.log('Current question num:', currentSessionQuestionNum);
+    console.log('Total questions:', sessionQuestions.length);
+    console.log('Session questions:', sessionQuestions);
+    
+    // Check if we're at the last question
+    if (currentSessionQuestionNum >= sessionQuestions.length) {
+      console.log('Session complete, showing results');
       setIsSessionModeActive(false);
       setShowSessionResults(true);
+      return;
     }
+
+    // Move to next question
+    setCurrentSessionQuestionNum(prevNum => prevNum + 1);
   };
   
-  const handleNextScenario = () => {
-    setCurrentScenarioIndex((prev) => (prev + 1) % filteredScenarios.length);
-  };
-
-  const handleAnswer = (isCorrect) => {
-    if (isCorrect) {
-      setScore((prev) => prev + 1);
-    }
+  const handleNextScenarioInSession = () => {
+    setCurrentScenarioIndex((prev) => (prev + 1) % scenarios.length);
   };
 
   let currentScenarioToDisplay;
   if (isSessionModeActive && sessionQuestions.length > 0) {
+    console.log('Getting scenario for display:', {
+      currentSessionQuestionNum,
+      sessionQuestionsLength: sessionQuestions.length,
+      sessionQuestions
+    });
+    // Subtract 1 from currentSessionQuestionNum since it's 1-based
     currentScenarioToDisplay = sessionQuestions[currentSessionQuestionNum - 1];
+    console.log('Selected scenario for display:', currentScenarioToDisplay);
   } else {
-    currentScenarioToDisplay = filteredScenarios[currentScenarioIndex];
+    currentScenarioToDisplay = scenarios[currentScenarioIndex];
   }
+
+  const renderNavigation = () => (
+    <div className="flex justify-center space-x-4 mb-8">
+      <button
+        onClick={() => setActiveView('practice')}
+        className={`px-4 py-2 rounded ${
+          activeView === 'practice'
+            ? 'bg-blue-500 text-white'
+            : 'bg-gray-200 hover:bg-gray-300'
+        }`}
+      >
+        Practice
+      </button>
+      <button
+        onClick={() => setActiveView('create')}
+        className={`px-4 py-2 rounded ${
+          activeView === 'create'
+            ? 'bg-blue-500 text-white'
+            : 'bg-gray-200 hover:bg-gray-300'
+        }`}
+      >
+        Create Scenario
+      </button>
+      <button
+        onClick={() => setActiveView('leaderboard')}
+        className={`px-4 py-2 rounded ${
+          activeView === 'leaderboard'
+            ? 'bg-blue-500 text-white'
+            : 'bg-gray-200 hover:bg-gray-300'
+        }`}
+      >
+        Leaderboard
+      </button>
+      <button
+        onClick={() => setActiveView('rules')}
+        className={`px-4 py-2 rounded ${
+          activeView === 'rules'
+            ? 'bg-blue-500 text-white'
+            : 'bg-gray-200 hover:bg-gray-300'
+        }`}
+      >
+        Rules
+      </button>
+    </div>
+  );
+
+  const renderContent = () => {
+    switch (activeView) {
+      case 'create':
+        return <CustomScenarioForm />;
+      case 'leaderboard':
+        return <Leaderboard />;
+      case 'rules':
+        return <RulesAgent />;
+      case 'practice':
+      default:
+        if (isLoading) {
+          return <div className="text-center">Loading scenarios...</div>;
+        }
+        if (error) {
+          return <div className="text-center text-red-500">{error}</div>;
+        }
+        if (scenarios.length === 0) {
+          return <div className="text-center">No scenarios available.</div>;
+        }
+        return (
+          <>
+            {!isSessionModeActive && !showSessionResults && (
+              <div className="animate-slide-in">
+                <PositionSelector 
+                  onSelect={handlePositionSelect}
+                  selectedPosition={selectedPosition}
+                />
+              </div>
+            )}
+
+            {selectedPosition && scenarios.length > 0 && !showSessionResults && (
+              <div className="mt-2 mb-2 p-2 bg-white shadow rounded-lg text-center hover-lift">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-800">
+                  Playing as: <span className="text-blue-600">{positions.find(p => p.id === selectedPosition)?.name || selectedPosition}</span>
+                </h2>
+              </div>
+            )}
+
+            {!isSessionModeActive && selectedPosition && scenarios.length > 0 && !showSessionResults && (
+              <div className="my-2 text-center">
+                <button 
+                  onClick={startSession}
+                  className="btn-primary text-base sm:text-lg"
+                >
+                  Start {Math.min(SESSION_LENGTH, getUnusedScenarios().length)}-Question Session
+                </button>
+              </div>
+            )}
+
+            {isSessionModeActive && currentSessionQuestionNum > 0 && sessionQuestions.length > 0 && (
+              <div className="text-center mb-2 p-2 bg-yellow-100 border border-yellow-300 rounded-lg animate-fade-in">
+                <p className="text-sm sm:text-base font-semibold text-yellow-800">
+                  Question {currentSessionQuestionNum} of {sessionQuestions.length}
+                </p>
+                <p className="text-xs sm:text-sm text-yellow-700">Score: {sessionScore}</p>
+              </div>
+            )}
+
+            {isSessionModeActive && currentScenarioToDisplay && (
+              <div className="animate-fade-in flex-grow">
+                <Flashcard 
+                  scenario={currentScenarioToDisplay} 
+                  onNextScenario={handleNextQuestionInSession}
+                  onAnswer={handleAnswerInSession}
+                  currentScore={sessionScore}
+                  totalScenarios={sessionQuestions.length}
+                  currentIndex={currentSessionQuestionNum - 1}
+                  selectedPosition={selectedPosition}
+                />
+              </div>
+            )}
+
+            {showSessionResults && (
+              <div className="mt-4 p-4 bg-white shadow-xl rounded-lg text-center animate-fade-in">
+                <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-2">Session Over!</h2>
+                <p className="text-base sm:text-lg text-gray-800 mb-1">
+                  You played as {positions.find(p => p.id === selectedPosition)?.name || selectedPosition}.
+                </p>
+                <p className="text-2xl sm:text-3xl font-semibold text-green-600 mb-4">
+                  Your Score: {sessionScore} / {sessionQuestions.length}
+                </p>
+                <div className="space-x-2 sm:space-x-4">
+                  <button
+                    onClick={startSession}
+                    className="btn-primary text-sm sm:text-base"
+                  >
+                    Play Again ({positions.find(p => p.id === selectedPosition)?.name || selectedPosition})
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedPosition(null);
+                      setScenarios([]);
+                      setCurrentScenarioIndex(0);
+                      setScore(0);
+                      setIsSessionModeActive(false);
+                      setShowSessionResults(false);
+                      setSessionQuestions([]);
+                      setCurrentSessionQuestionNum(0);
+                      setSessionScore(0);
+                    }}
+                    className="btn-secondary text-sm sm:text-base"
+                  >
+                    Choose New Position
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {selectedPosition && scenarios.length === 0 && !isSessionModeActive && !showSessionResults && (
+              <div className="mt-2 p-3 bg-white shadow-md rounded-lg text-center animate-fade-in">
+                <p className="text-sm sm:text-base text-gray-700">
+                  No scenarios currently available for {positions.find(p => p.id === selectedPosition)?.name || selectedPosition}. Check back later!
+                </p>
+              </div>
+            )}
+            {!selectedPosition && !isSessionModeActive && !showSessionResults && (
+              <div className="mt-2 p-3 bg-white shadow-md rounded-lg text-center animate-fade-in">
+                <p className="text-sm sm:text-base text-gray-600">
+                  Please select a position to start.
+                </p>
+              </div>
+            )}
+          </>
+        );
+    }
+  };
 
   return (
     <div className="min-h-screen bg-baseball flex flex-col items-center pt-4 pb-4">
@@ -143,100 +356,9 @@ function App() {
           Master the fundamentals, one play at a time
         </p>
       </header>
+      {renderNavigation()}
       <main className="p-2 w-full max-w-2xl flex-grow flex flex-col">
-        {!isSessionModeActive && !showSessionResults && (
-          <div className="animate-slide-in">
-            <PositionSelector 
-              selectedPosition={selectedPosition} 
-              onPositionChange={handlePositionChange} 
-            />
-          </div>
-        )}
-
-        {selectedPosition && currentPositionName && !showSessionResults && (
-          <div className="mt-2 mb-2 p-2 bg-white shadow rounded-lg text-center hover-lift">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-800">
-              Playing as: <span className="text-blue-600">{currentPositionName} ({selectedPosition})</span>
-            </h2>
-          </div>
-        )}
-
-        {!isSessionModeActive && selectedPosition && filteredScenarios.length > 0 && !showSessionResults && (
-          <div className="my-2 text-center">
-            <button 
-              onClick={startSession}
-              className="btn-primary text-base sm:text-lg"
-            >
-              Start {Math.min(SESSION_LENGTH, getUnusedScenarios().length)}-Question Session
-            </button>
-          </div>
-        )}
-
-        {isSessionModeActive && currentSessionQuestionNum > 0 && sessionQuestions.length > 0 && (
-          <div className="text-center mb-2 p-2 bg-yellow-100 border border-yellow-300 rounded-lg animate-fade-in">
-            <p className="text-sm sm:text-base font-semibold text-yellow-800">
-              Question {currentSessionQuestionNum} of {sessionQuestions.length}
-            </p>
-            <p className="text-xs sm:text-sm text-yellow-700">Score: {sessionScore}</p>
-          </div>
-        )}
-
-        {isSessionModeActive && currentScenarioToDisplay && (
-          <div className="animate-fade-in flex-grow">
-            <Flashcard 
-              scenario={currentScenarioToDisplay} 
-              onNextScenario={handleNextQuestionInSession}
-              onAnswer={handleAnswerInSession}
-              currentScore={sessionScore}
-              totalScenarios={sessionQuestions.length}
-              currentIndex={currentSessionQuestionNum - 1}
-              selectedPosition={selectedPosition}
-            />
-          </div>
-        )}
-
-        {showSessionResults && (
-          <div className="mt-4 p-4 bg-white shadow-xl rounded-lg text-center animate-fade-in">
-            <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-2">Session Over!</h2>
-            <p className="text-base sm:text-lg text-gray-800 mb-1">
-              You played as {currentPositionName} ({selectedPosition}).
-            </p>
-            <p className="text-2xl sm:text-3xl font-semibold text-green-600 mb-4">
-              Your Score: {sessionScore} / {sessionQuestions.length}
-            </p>
-            <div className="space-x-2 sm:space-x-4">
-              <button
-                onClick={startSession}
-                className="btn-primary text-sm sm:text-base"
-              >
-                Play Again ({currentPositionName})
-              </button>
-              <button
-                onClick={() => {
-                  setSelectedPosition('');
-                }}
-                className="btn-secondary text-sm sm:text-base"
-              >
-                Choose New Position
-              </button>
-            </div>
-          </div>
-        )}
-
-        {selectedPosition && filteredScenarios.length === 0 && !isSessionModeActive && !showSessionResults && (
-          <div className="mt-2 p-3 bg-white shadow-md rounded-lg text-center animate-fade-in">
-            <p className="text-sm sm:text-base text-gray-700">
-              No scenarios currently available for {currentPositionName} ({selectedPosition}). Check back later!
-            </p>
-          </div>
-        )}
-        {!selectedPosition && !isSessionModeActive && !showSessionResults && (
-          <div className="mt-2 p-3 bg-white shadow-md rounded-lg text-center animate-fade-in">
-            <p className="text-sm sm:text-base text-gray-600">
-              Please select a position to start.
-            </p>
-          </div>
-        )}
+        {renderContent()}
       </main>
     </div>
   );

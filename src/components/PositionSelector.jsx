@@ -1,7 +1,7 @@
 import React from 'react';
 import { positions } from '../data/positions';
 
-function PositionSelector({ selectedPosition, onPositionChange }) {
+function PositionSelector({ selectedPosition, onSelect }) {
   return (
     <div className="my-4">
       <label htmlFor="position-select" className="block text-lg font-medium text-gray-700 mb-1">
@@ -9,8 +9,8 @@ function PositionSelector({ selectedPosition, onPositionChange }) {
       </label>
       <select
         id="position-select"
-        value={selectedPosition}
-        onChange={(e) => onPositionChange(e.target.value)}
+        value={selectedPosition || ''}
+        onChange={(e) => onSelect(e.target.value)}
         className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md shadow-sm"
       >
         <option value="" disabled>Select a position</option>
