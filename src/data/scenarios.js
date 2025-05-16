@@ -499,16 +499,16 @@ export const scenarios = [
     "positionFocus": ["1B"],
     "baseRunners": { "first": true, "second": false, "third": false },
     "outs": 0,
-    "ballLocation": { "x": 200, "y": 200 },
+    "ballLocation": { "x": 200, "y": 250 },
     "situation": "Runner on 1st, 0 outs. A bunt is laid down in front of the plate.",
     "question": "What should you do?",
     "options": [
-      { "text": "Charge in to field the bunt, then throw to second base to get the lead runner.", "isCorrect": true },
+      { "text": "Charge in to field the bunt, then throw to first base to get the sure out.", "isCorrect": true },
+      { "text": "Try to throw to second base to get the lead runner.", "isCorrect": false },
       { "text": "Stay at first base and wait for the throw.", "isCorrect": false },
-      { "text": "Run to home plate to help.", "isCorrect": false },
       { "text": "Stay at first base and watch the play.", "isCorrect": false }
     ],
-    "explanation": "On a bunt with a runner on first, the first baseman should charge in to field the bunt. This helps prevent the runner from advancing to second."
+    "explanation": "In youth baseball, always take the sure out. Field the bunt cleanly and throw to first base. Trying to get the lead runner at second is too risky and could result in no outs."
   },
   {
     "id": "1b-popup-runner-on-1st-1out",
@@ -643,16 +643,16 @@ export const scenarios = [
     "positionFocus": ["3B"],
     "baseRunners": { "first": true, "second": false, "third": false },
     "outs": 0,
-    "ballLocation": { "x": 200, "y": 200 },
+    "ballLocation": { "x": 200, "y": 250 },
     "situation": "Runner on 1st, 0 outs. A bunt is laid down in front of the plate.",
     "question": "What should you do?",
     "options": [
-      { "text": "Charge in to field the bunt, then throw to second base to get the lead runner.", "isCorrect": true },
+      { "text": "Charge in to field the bunt, then throw to first base to get the sure out.", "isCorrect": true },
+      { "text": "Try to throw to second base to get the lead runner.", "isCorrect": false },
       { "text": "Stay at third base and wait for the throw.", "isCorrect": false },
-      { "text": "Run to home plate to help.", "isCorrect": false },
       { "text": "Stay at third base and watch the play.", "isCorrect": false }
     ],
-    "explanation": "On a bunt with a runner on first, the third baseman should charge in to field the bunt. This helps prevent the runner from advancing to second."
+    "explanation": "In youth baseball, always take the sure out. Field the bunt cleanly and throw to first base. Trying to get the lead runner at second is too risky and could result in no outs."
   },
   {
     "id": "3b-popup-runner-on-1st-1out",
@@ -678,13 +678,10 @@ export const scenarios = [
     "ballLocation": { "x": 120, "y": 180 },
     "situation": "Runner on 2nd, 1 out. A ground ball is hit to you.",
     "question": "What should you do?",
-    "options": [
-      { "text": "Field the ball and throw to first base to get the batter-runner.", "isCorrect": true },
-      { "text": "Field the ball and throw to second base.", "isCorrect": false },
-      { "text": "Field the ball and throw to third base.", "isCorrect": false },
-      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
-    ],
-    "explanation": "With a runner on second and one out, getting the batter-runner at first is the priority. A strong, accurate throw to first base is crucial, as it keeps the runner from being in scoring position."
+    { "text": "Field the ball and throw to first base to get the batter-runner.", "isCorrect": true },
+    { "text": "Field the ball and throw to second base.", "isCorrect": false },
+    { "text": "Field the ball and throw to third base.", "isCorrect": false },
+    { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
   },
   {
     "id": "3b-grounder-runner-on-3rd-2outs",
@@ -694,13 +691,10 @@ export const scenarios = [
     "ballLocation": { "x": 120, "y": 180 },
     "situation": "Runner on 3rd, 2 outs. A ground ball is hit to you.",
     "question": "What should you do?",
-    "options": [
-      { "text": "Field the ball and throw to first base to get the batter-runner.", "isCorrect": true },
-      { "text": "Field the ball and throw to third base.", "isCorrect": false },
-      { "text": "Field the ball and throw to home plate.", "isCorrect": false },
-      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
-    ],
-    "explanation": "With a runner on third and two outs, getting the batter-runner at first is the top priority. A strong, accurate throw to first base is crucial, as it could be the final out of the inning."
+    { "text": "Field the ball and throw to first base to get the batter-runner.", "isCorrect": true },
+    { "text": "Field the ball and throw to third base.", "isCorrect": false },
+    { "text": "Field the ball and throw to home plate.", "isCorrect": false },
+    { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
   },
   {
     "id": "cf-flyball-runner-on-2nd-1out",
@@ -710,13 +704,10 @@ export const scenarios = [
     "ballLocation": { "x": 200, "y": 30 },
     "situation": "Runner on 2nd, 1 out. A deep fly ball is hit to you in center field.",
     "question": "What's your priority after catching the ball?",
-    "options": [
-      { "text": "Make a strong throw to third base to prevent the runner from advancing.", "isCorrect": true },
-      { "text": "Throw to second base to keep the runner from advancing.", "isCorrect": false },
-      { "text": "Throw to first base to get the batter.", "isCorrect": false },
-      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
-    ],
-    "explanation": "With a runner on second and one out, preventing the runner from advancing to third is crucial. A strong, accurate throw to third base is the priority, as it keeps the runner from being in scoring position."
+    { "text": "Make a strong throw to third base to prevent the runner from advancing.", "isCorrect": true },
+    { "text": "Throw to second base to keep the runner from advancing.", "isCorrect": false },
+    { "text": "Throw to first base to get the batter.", "isCorrect": false },
+    { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
   },
   {
     "id": "cf-flyball-runner-on-3rd-2outs",
@@ -726,13 +717,10 @@ export const scenarios = [
     "ballLocation": { "x": 200, "y": 30 },
     "situation": "Runner on 3rd, 2 outs. A deep fly ball is hit to you in center field.",
     "question": "What's your priority after catching the ball?",
-    "options": [
-      { "text": "Make a strong throw to home plate to prevent the runner from scoring.", "isCorrect": true },
-      { "text": "Throw to third base to keep the runner from advancing.", "isCorrect": false },
-      { "text": "Throw to second base to prevent a double.", "isCorrect": false },
-      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
-    ],
-    "explanation": "With a runner on third and two outs, preventing the runner from scoring is the top priority. A strong, accurate throw to home plate is crucial, as it could be the final out of the inning."
+    { "text": "Make a strong throw to home plate to prevent the runner from scoring.", "isCorrect": true },
+    { "text": "Throw to third base to keep the runner from advancing.", "isCorrect": false },
+    { "text": "Throw to second base to prevent a double.", "isCorrect": false },
+    { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
   },
   {
     "id": "cf-line-drive-runner-on-1st-0outs",
@@ -742,13 +730,10 @@ export const scenarios = [
     "ballLocation": { "x": 200, "y": 30 },
     "situation": "Runner on 1st, 0 outs. A line drive is hit to you in center field.",
     "question": "What's your priority after fielding the ball?",
-    "options": [
-      { "text": "Make a strong throw to second base to prevent the runner from advancing.", "isCorrect": true },
-      { "text": "Throw to first base to get the batter.", "isCorrect": false },
-      { "text": "Throw to third base to prevent a triple.", "isCorrect": false },
-      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
-    ],
-    "explanation": "With a runner on first and no outs, preventing the runner from advancing to second is crucial. A strong, accurate throw to second base is the priority, as it keeps the runner from being in scoring position."
+    { "text": "Make a strong throw to second base to prevent the runner from advancing.", "isCorrect": true },
+    { "text": "Throw to first base to get the batter.", "isCorrect": false },
+    { "text": "Throw to third base to prevent a triple.", "isCorrect": false },
+    { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
   },
   {
     "id": "cf-line-drive-runner-on-2nd-1out",
@@ -758,13 +743,10 @@ export const scenarios = [
     "ballLocation": { "x": 200, "y": 30 },
     "situation": "Runner on 2nd, 1 out. A line drive is hit to you in center field.",
     "question": "What's your priority after fielding the ball?",
-    "options": [
-      { "text": "Make a strong throw to third base to prevent the runner from advancing.", "isCorrect": true },
-      { "text": "Throw to second base to keep the runner from advancing.", "isCorrect": false },
-      { "text": "Throw to first base to get the batter.", "isCorrect": false },
-      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
-    ],
-    "explanation": "With a runner on second and one out, preventing the runner from advancing to third is crucial. A strong, accurate throw to third base is the priority, as it keeps the runner from being in scoring position."
+    { "text": "Make a strong throw to third base to prevent the runner from advancing.", "isCorrect": true },
+    { "text": "Throw to second base to keep the runner from advancing.", "isCorrect": false },
+    { "text": "Throw to first base to get the batter.", "isCorrect": false },
+    { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
   },
   {
     "id": "c-steal-2nd-runner-on-1st-1out",
@@ -774,13 +756,10 @@ export const scenarios = [
     "ballLocation": { "x": 200, "y": 320 },
     "situation": "Runner on 1st, 1 out. The runner takes off for second base on the pitch.",
     "question": "What's your immediate action?",
-    "options": [
-      { "text": "Pop up quickly, make a strong throw to second base, aiming for the shortstop covering the bag.", "isCorrect": true },
-      { "text": "Hold the ball and check other runners.", "isCorrect": false },
-      { "text": "Throw to first base to keep the runner close.", "isCorrect": false },
-      { "text": "Wait for the pitch to be called before throwing.", "isCorrect": false }
-    ],
-    "explanation": "In youth baseball, quick, accurate throws are crucial. Pop up quickly and make a strong throw to second base. The shortstop should be covering the bag on a steal attempt."
+    { "text": "Pop up quickly, make a strong throw to second base, aiming for the shortstop covering the bag.", "isCorrect": true },
+    { "text": "Hold the ball and check other runners.", "isCorrect": false },
+    { "text": "Throw to first base to keep the runner close.", "isCorrect": false },
+    { "text": "Wait for the pitch to be called before throwing.", "isCorrect": false }
   },
   {
     "id": "c-bunt-runner-on-1st-0outs",
@@ -790,13 +769,10 @@ export const scenarios = [
     "ballLocation": { "x": 200, "y": 250 },
     "situation": "Runner on 1st, 0 outs. A bunt is laid down in front of the plate.",
     "question": "What should you do?",
-    "options": [
-      { "text": "Charge out quickly, field the bunt, and throw to second base to get the lead runner.", "isCorrect": true },
-      { "text": "Stay at home plate and wait for the throw.", "isCorrect": false },
-      { "text": "Let the pitcher field it.", "isCorrect": false },
-      { "text": "Stay at home plate and watch the play.", "isCorrect": false }
-    ],
-    "explanation": "On a bunt with a runner on first, the catcher should charge out quickly to field the bunt. This helps prevent the runner from advancing to second."
+    { "text": "Charge out quickly, field the bunt, and throw to first base to get the sure out.", "isCorrect": true },
+    { "text": "Try to throw to second base to get the lead runner.", "isCorrect": false },
+    { "text": "Let the pitcher field it.", "isCorrect": false },
+    { "text": "Stay at home plate and watch the play.", "isCorrect": false }
   },
   {
     "id": "c-popup-runner-on-1st-1out",
@@ -806,13 +782,10 @@ export const scenarios = [
     "ballLocation": { "x": 200, "y": 320 },
     "situation": "Runner on 1st, 1 out. A pop-up is hit to you in foul territory.",
     "question": "What should you do?",
-    "options": [
-      { "text": "Call for the ball loudly and make the catch if you can reach it.", "isCorrect": true },
-      { "text": "Let the first baseman catch it since it's in foul territory.", "isCorrect": false },
-      { "text": "Let the pitcher catch it.", "isCorrect": false },
-      { "text": "Stay at home plate and watch the play.", "isCorrect": false }
-    ],
-    "explanation": "As the catcher, you have priority on pop-ups in foul territory you can reach. Clear communication is key. Call for the ball loudly if you can make the play."
+    { "text": "Call for the ball loudly and make the catch if you can reach it.", "isCorrect": true },
+    { "text": "Let the first baseman catch it since it's in foul territory.", "isCorrect": false },
+    { "text": "Let the pitcher catch it.", "isCorrect": false },
+    { "text": "Stay at home plate and watch the play.", "isCorrect": false }
   },
   {
     "id": "c-grounder-runner-on-3rd-2outs",
@@ -821,13 +794,9 @@ export const scenarios = [
     "outs": 2,
     "ballLocation": { "x": 200, "y": 320 },
     "situation": "Runner on 3rd, 2 outs. A ground ball is hit to you.",
-    "question": "What should you do?",
-    "options": [
-      { "text": "Field the ball and throw to first base to get the batter-runner.", "isCorrect": true },
-      { "text": "Field the ball and throw to third base.", "isCorrect": false },
-      { "text": "Field the ball and throw to home plate.", "isCorrect": false },
-      { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
-    ],
-    "explanation": "With a runner on third and two outs, getting the batter-runner at first is the top priority. A strong, accurate throw to first base is crucial, as it could be the final out of the inning."
+    { "text": "Field the ball and throw to first base to get the batter-runner.", "isCorrect": true },
+    { "text": "Field the ball and throw to third base.", "isCorrect": false },
+    { "text": "Field the ball and throw to home plate.", "isCorrect": false },
+    { "text": "Hold the ball and check the runner's position.", "isCorrect": false }
   }
 ]; 
