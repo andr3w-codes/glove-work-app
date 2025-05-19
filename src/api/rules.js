@@ -1,6 +1,6 @@
-const API_URL = 'http://localhost:3001';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-export async function askQuestion(question) {
+export const askQuestion = async (question) => {
   if (!question) {
     throw new Error('Question is required');
   }
@@ -24,4 +24,4 @@ export async function askQuestion(question) {
     console.error('Error processing question:', error);
     throw new Error(error.message || 'Failed to process question');
   }
-} 
+}; 
