@@ -30,6 +30,15 @@ app.use((req, res, next) => {
 app.use(cors());
 app.use(express.json());
 
+// Root route
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'ok',
+    message: 'Glove Work Backend API',
+    version: '1.0.0'
+  });
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   console.log('Health check requested');
@@ -128,8 +137,9 @@ app.post('/api/rules/ask', async (req, res) => {
   }
 });
 
-app.listen(port, '0.0.0.0', () => {
-  console.log(`Server running on port ${port}`);
+const server = app.listen(port, '0.0.0.0', () => {
+  const host = server.address();
+  console.log(`Server running at http://${host.address}:${host.port}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`OpenAI API Key present: ${!!process.env.OPENAI_API_KEY}`);
 }); 
