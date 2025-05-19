@@ -4,6 +4,7 @@ import Flashcard from './components/Flashcard';
 import CustomScenarioForm from './components/CustomScenarioForm';
 import Leaderboard from './components/Leaderboard';
 import RulesAgent from './components/RulesAgent';
+import Navigation from './components/Navigation';
 import { scenarios as staticScenarios } from './data/scenarios';
 import { positions } from './data/positions';
 import './App.css';
@@ -170,51 +171,6 @@ function App() {
     currentScenarioToDisplay = scenarios[currentScenarioIndex];
   }
 
-  const renderNavigation = () => (
-    <div className="flex justify-center space-x-4 mb-8">
-      <button
-        onClick={() => setActiveView('practice')}
-        className={`px-4 py-2 rounded ${
-          activeView === 'practice'
-            ? 'bg-blue-500 text-white'
-            : 'bg-gray-200 hover:bg-gray-300'
-        }`}
-      >
-        Practice
-      </button>
-      <button
-        onClick={() => setActiveView('create')}
-        className={`px-4 py-2 rounded ${
-          activeView === 'create'
-            ? 'bg-blue-500 text-white'
-            : 'bg-gray-200 hover:bg-gray-300'
-        }`}
-      >
-        Create Scenario
-      </button>
-      <button
-        onClick={() => setActiveView('leaderboard')}
-        className={`px-4 py-2 rounded ${
-          activeView === 'leaderboard'
-            ? 'bg-blue-500 text-white'
-            : 'bg-gray-200 hover:bg-gray-300'
-        }`}
-      >
-        Leaderboard
-      </button>
-      <button
-        onClick={() => setActiveView('rules')}
-        className={`px-4 py-2 rounded ${
-          activeView === 'rules'
-            ? 'bg-blue-500 text-white'
-            : 'bg-gray-200 hover:bg-gray-300'
-        }`}
-      >
-        Rules
-      </button>
-    </div>
-  );
-
   const renderContent = () => {
     switch (activeView) {
       case 'create':
@@ -343,21 +299,26 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-baseball flex flex-col items-center pt-4 pb-4">
-      <header className="text-center p-2 animate-fade-in">
-        <div className="flex items-center justify-center space-x-2 mb-1">
-          <span className="text-2xl sm:text-3xl">⚾</span>
-          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
-            Glove Work
-          </h1>
-          <span className="text-2xl sm:text-3xl">🧢</span>
+    <div className="min-h-screen bg-baseball flex flex-col">
+      <header className="sticky top-0 z-20 bg-white/90 backdrop-blur-sm shadow-sm">
+        <div className="max-w-2xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <span className="text-2xl">⚾</span>
+              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+                Glove Work
+              </h1>
+              <span className="text-2xl">🧢</span>
+            </div>
+            <Navigation activeView={activeView} setActiveView={setActiveView} />
+          </div>
+          <p className="text-sm text-gray-600 mt-1">
+            Master the fundamentals, one play at a time
+          </p>
         </div>
-        <p className="text-sm sm:text-base text-gray-700 font-medium">
-          Master the fundamentals, one play at a time
-        </p>
       </header>
-      {renderNavigation()}
-      <main className="p-2 w-full max-w-2xl flex-grow flex flex-col">
+
+      <main className="flex-grow max-w-2xl w-full mx-auto px-4 py-4">
         {renderContent()}
       </main>
     </div>
