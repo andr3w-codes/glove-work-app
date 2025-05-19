@@ -20,13 +20,25 @@ if (!process.env.OPENAI_API_KEY) {
 const app = express();
 const port = process.env.PORT || 3001;
 
+// Add request logging middleware
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
+
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  console.log('Health check requested');
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    port: port,
+    env: process.env.NODE_ENV
+  });
 });
 
 // Initialize OpenAI
@@ -116,6 +128,8 @@ app.post('/api/rules/ask', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`Server running on port ${port}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`OpenAI API Key present: ${!!process.env.OPENAI_API_KEY}`);
 }); 
