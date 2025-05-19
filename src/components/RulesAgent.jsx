@@ -60,7 +60,7 @@ const RulesAgent = () => {
   return (
     <div className="max-w-4xl mx-auto p-4">
       <div className="bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Baseball Rules Assistant</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Little League Rules Assistant</h2>
         
         <div className="mb-6">
           <form onSubmit={handleSubmit} className="mb-4">
