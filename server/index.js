@@ -27,12 +27,7 @@ app.use((req, res, next) => {
 });
 
 // Middleware
-app.use(cors({
-  origin: ['https://andr3w-codes.github.io', 'http://localhost:5173'],
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
+app.use(cors());
 app.use(express.json());
 
 // Root route
