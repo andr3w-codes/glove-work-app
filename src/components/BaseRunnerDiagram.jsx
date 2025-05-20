@@ -96,7 +96,7 @@ function BaseRunnerDiagram({ baseRunners, outs, ballLocation, onBallLocationSele
 
         {/* Home plate (inset into arc) */}
         <circle cx="200" cy="300" r="30" fill="#d2b48c" stroke="black" strokeWidth="2"/>
-        <polygon points="200,295 210,305 200,315 190,305" fill="white" stroke="black" strokeWidth="1"/>
+        <polygon points="200,280 210,290 200,300 190,290" fill="white" stroke="black" strokeWidth="1"/>
 
         {/* Runners */}
         {baseRunners.first && (
