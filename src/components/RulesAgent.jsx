@@ -48,7 +48,7 @@ const RulesAgent = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
+    <div className="w-full max-w-4xl mx-auto px-2 sm:px-4 py-2">
       <div className="bg-white rounded-lg shadow-lg p-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Little League Rules Assistant</h2>
         
@@ -62,7 +62,7 @@ const RulesAgent = () => {
               }`}
             >
               <div
-                className={`inline-block p-4 rounded-lg max-w-[80%] ${
+                className={`inline-block p-3 rounded-lg max-w-[95vw] sm:max-w-[80%] text-sm sm:text-base ${
                   message.type === 'user'
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-100 text-gray-800'
