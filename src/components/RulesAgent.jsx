@@ -3,58 +3,48 @@ import { askQuestion } from '../api/rules';
 
 const RulesAgent = () => {
   const [question, setQuestion] = useState('');
-  const [answer, setAnswer] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [chatHistory, setChatHistory] = useState([
+    {
+      type: 'ai',
+      content: `<h2>Welcome to the Little League Rules Assistant!</h2>
+        <p>Ask me any question about Little League baseball rules, pitch counts, infield fly, or other scenarios. I'll do my best to provide clear, official, and helpful answers.</p>
+        <ul>
+          <li>Try: <strong>What are the pitch count rules for 11-year-olds?</strong></li>
+          <li>Try: <strong>Explain the infield fly rule</strong></li>
+        </ul>
+        <p>For official rules, see the resources below.</p>`,
+      sources: []
+    }
+  ]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!question.trim()) return;
 
+    // Add user message to chat
+    const userMessage = { type: 'user', content: question };
+    setChatHistory(prev => [...prev, userMessage]);
     setLoading(true);
     setError(null);
 
     try {
-      const data = await askQuestion(question.trim());
-      setAnswer(data);
+      const response = await askQuestion(question.trim());
+      // Add AI response to chat
+      const aiMessage = { 
+        type: 'ai', 
+        content: response.content,
+        sources: response.sources
+      };
+      setChatHistory(prev => [...prev, aiMessage]);
     } catch (err) {
       console.error('Error getting answer:', err);
       setError(err.message || 'Sorry, I encountered an error while processing your question. Please try again.');
     } finally {
       setLoading(false);
+      setQuestion('');
     }
-  };
-
-  const renderMarkdown = (content) => {
-    // Split content into lines
-    const lines = content.split('\n');
-    
-    return lines.map((line, index) => {
-      // Handle headers
-      if (line.startsWith('## ')) {
-        return <h2 key={index} className="text-xl font-bold text-gray-800 mt-4 mb-2">{line.replace('## ', '')}</h2>;
-      }
-      
-      // Handle bullet points
-      if (line.startsWith('- ')) {
-        return <li key={index} className="ml-4 text-gray-600">{line.replace('- ', '')}</li>;
-      }
-      
-      // Handle code blocks
-      if (line.startsWith('```')) {
-        return null; // Skip the ``` markers
-      }
-      
-      // Handle bold text
-      const boldText = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      
-      // Handle regular paragraphs
-      if (line.trim()) {
-        return <p key={index} className="text-gray-600 my-2" dangerouslySetInnerHTML={{ __html: boldText }} />;
-      }
-      
-      return <br key={index} />;
-    });
   };
 
   return (
@@ -62,78 +52,93 @@ const RulesAgent = () => {
       <div className="bg-white rounded-lg shadow-lg p-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Little League Rules Assistant</h2>
         
-        <div className="mb-6">
-          <form onSubmit={handleSubmit} className="mb-4">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                placeholder="Ask a question about baseball rules..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <button
-                type="submit"
-                disabled={loading || !question.trim()}
-                className={`px-4 py-2 rounded-lg text-white font-medium ${
-                  loading || !question.trim()
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700'
+        {/* Chat History */}
+        <div className="mb-6 h-[60vh] overflow-y-auto border border-gray-200 rounded-lg p-4">
+          {chatHistory.map((message, index) => (
+            <div
+              key={index}
+              className={`mb-4 ${
+                message.type === 'user' ? 'text-right' : 'text-left'
+              }`}
+            >
+              <div
+                className={`inline-block p-4 rounded-lg max-w-[80%] ${
+                  message.type === 'user'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-800'
                 }`}
               >
-                {loading ? 'Thinking...' : 'Ask'}
-              </button>
+                {message.type === 'ai' ? (
+                  <>
+                    <div 
+                      className="prose max-w-none prose-pre:whitespace-pre-wrap prose-pre:break-words prose-pre:overflow-x-auto prose-pre:bg-gray-50 prose-pre:p-2 prose-pre:rounded"
+                      style={{ 
+                        wordBreak: 'break-word',
+                        overflowWrap: 'break-word'
+                      }}
+                      dangerouslySetInnerHTML={{ __html: message.content }}
+                    />
+                    {message.sources && message.sources.length > 0 && (
+                      <div className="mt-4 pt-4 border-t border-gray-200">
+                        <h4 className="text-sm font-semibold text-gray-700 mb-2">Sources:</h4>
+                        <ul className="space-y-1">
+                          {message.sources.map((source, idx) => (
+                            <li key={idx}>
+                              <a
+                                href={source.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-800 text-sm break-words"
+                              >
+                                {source.title} →
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <p className="break-words">{message.content}</p>
+                )}
+              </div>
             </div>
-          </form>
-
+          ))}
+          {loading && (
+            <div className="text-center my-4">
+              <div className="inline-block animate-pulse text-gray-500">Thinking...</div>
+            </div>
+          )}
           {error && (
             <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
               {error}
             </div>
           )}
-
-          {answer && (
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-              <div className="prose max-w-none">
-                {renderMarkdown(answer.content)}
-              </div>
-              {answer.sources && answer.sources.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Sources:</h4>
-                  <ul className="space-y-1">
-                    {answer.sources.map((source, index) => (
-                      <li key={index}>
-                        <a
-                          href={source.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 text-sm"
-                        >
-                          {source.title} →
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
-        <div className="mb-6">
-          <p className="text-gray-600 mb-4">
-            This assistant uses AI to help answer your questions about baseball rules. For complete and official rules, please refer to the 
-            <a 
-              href="https://www.littleleague.org/playing-rules/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-800 ml-1"
+        {/* Input Form */}
+        <form onSubmit={handleSubmit} className="mb-4">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="Ask a question about little league rules..."
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              type="submit"
+              disabled={loading || !question.trim()}
+              className={`px-4 py-2 rounded-lg text-white font-medium ${
+                loading || !question.trim()
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700'
+              }`}
             >
-              Little League Official Rules
-            </a>
-            or download the Little League Rulebook App.
-          </p>
-        </div>
+              {loading ? 'Thinking...' : 'Send'}
+            </button>
+          </div>
+        </form>
 
         <div className="mt-8 p-4 bg-blue-50 rounded-lg">
           <h3 className="font-semibold text-blue-800 mb-2">Official Resources</h3>
