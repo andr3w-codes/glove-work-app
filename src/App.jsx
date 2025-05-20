@@ -5,7 +5,6 @@ import CustomScenarioForm from './components/CustomScenarioForm';
 import Leaderboard from './components/Leaderboard';
 import RulesAgent from './components/RulesAgent';
 import Navigation from './components/Navigation';
-import { scenarios as staticScenarios } from './data/scenarios';
 import { positions } from './data/positions';
 import './App.css';
 import { db } from './db/clientConfig';

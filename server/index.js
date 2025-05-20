@@ -62,32 +62,34 @@ Your responses should be:
 3. Include relevant context and examples
 4. Cite official sources when possible
 
-Format your response in markdown with the following structure:
-- Start with a brief, direct answer
-- Use headers (##) for main sections
-- Use bullet points for lists
-- Use bold text for important terms
-- Use tables when presenting structured data
-- Include relevant examples in code blocks
+Format your response in HTML with the following structure:
+- Start with a brief, direct answer in a paragraph
+- Use h2 and h3 tags for main sections
+- Use ul and li tags for lists
+- Use strong tags for important terms
+- Use table tags when presenting structured data
+- Include relevant examples in pre tags
 - End with a "For more information" section with official sources
 
 Example format:
-## Direct Answer
-Brief, clear answer to the question.
+<h2>Direct Answer</h2>
+<p>Brief, clear answer to the question.</p>
 
-## Details
-- Key point 1
-- Key point 2
-- Key point 3
+<h2>Details</h2>
+<ul>
+  <li>Key point 1</li>
+  <li>Key point 2</li>
+  <li>Key point 3</li>
+</ul>
 
-## Examples
-\`\`\`
+<h2>Examples</h2>
+<pre>
 Example situation:
 What happens: ...
-\`\`\`
+</pre>
 
-## For More Information
-[Official Rule Source](https://www.littleleague.org/playing-rules/)`;
+<h2>For More Information</h2>
+<a href="https://www.littleleague.org/playing-rules/">Official Rule Source</a>`;
 
 // API endpoint
 app.post('/api/rules/ask', async (req, res) => {
