@@ -2,7 +2,6 @@
 export const schema = {
   customScenarios: {
     id: 'uuid',
-    coachId: 'uuid',
     positionFocus: 'string[]',
     baseRunners: 'jsonb',
     outs: 'integer',

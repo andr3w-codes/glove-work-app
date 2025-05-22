@@ -55,16 +55,6 @@ export const db = {
     return data[0];
   },
 
-  async getCustomScenarios(coachId) {
-    const { data, error } = await supabase
-      .from('custom_scenarios')
-      .select('*')
-      .eq('coachId', coachId);
-    
-    if (error) throw error;
-    return data;
-  },
-
   async getCustomScenarios() {
     const { data, error } = await supabase
       .from('custom_scenarios')

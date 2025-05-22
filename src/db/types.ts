@@ -1,6 +1,5 @@
 export interface CustomScenario {
   id: string;
-  coachId: string;
   positionFocus: string[];
   baseRunners: {
     first: boolean;
