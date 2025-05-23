@@ -4,22 +4,27 @@ import { positions } from '../data/positions';
 function PositionSelector({ selectedPosition, onSelect }) {
   return (
     <div className="my-4">
-      <label htmlFor="position-select" className="block text-lg font-medium text-gray-700 mb-1">
+      <label className="block text-lg font-medium text-gray-200 mb-3 text-center">
         Choose a Position:
       </label>
-      <select
-        id="position-select"
-        value={selectedPosition || ''}
-        onChange={(e) => onSelect(e.target.value)}
-        className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md shadow-sm"
-      >
-        <option value="" disabled>Select a position</option>
-        {positions.map((position) => (
-          <option key={position.id} value={position.id}>
-            {position.name} ({position.id})
-          </option>
-        ))}
-      </select>
+      <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+        {positions.map((position) => {
+          const isSelected = selectedPosition === position.id;
+          return (
+            <button
+              key={position.id}
+              onClick={() => onSelect(position.id)}
+              className={`flex flex-col items-center justify-center p-4 rounded-lg border transition-all duration-200 font-semibold text-base shadow-md
+                ${isSelected ? 'bg-blue-700 border-blue-400 text-white scale-105' : 'bg-[#23232a] border-gray-700 text-gray-100 hover:bg-blue-800 hover:text-white hover:border-blue-500'}
+              `}
+              style={{ minHeight: '72px' }}
+            >
+              <span className="text-lg font-bold">{position.id}</span>
+              <span className="text-xs mt-1 opacity-80">{position.name}</span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

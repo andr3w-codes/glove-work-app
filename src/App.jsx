@@ -23,6 +23,7 @@ function shuffleArray(array) {
 }
 
 function App() {
+  const [allScenarios, setAllScenarios] = useState([]); // Store all scenarios
   const [scenarios, setScenarios] = useState([]);
   const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -46,7 +47,7 @@ function App() {
     try {
       setIsLoading(true);
       const dbScenarios = await db.getCustomScenarios();
-      console.log('Loaded scenarios:', dbScenarios);
+      setAllScenarios(dbScenarios);
       setScenarios(dbScenarios);
       setError(null);
     } catch (err) {
@@ -68,49 +69,40 @@ function App() {
   };
 
   const handlePositionSelect = (position) => {
-    console.log('Position selected:', position);
     setSelectedPosition(position);
   };
 
-  const resetToDefaultView = useCallback(() => {
-    setIsSessionModeActive(false);
-    setShowSessionResults(false);
-    setSessionQuestions([]);
-    setCurrentSessionQuestionNum(0);
-    setSessionScore(0);
-    setCurrentScenarioIndex(0);
-  }, []);
-
+  // Only filter scenarios and reset session state when a new position is selected
   useEffect(() => {
     if (selectedPosition) {
-      console.log('Selected position:', selectedPosition);
-      console.log('All scenarios:', scenarios);
-      const relevantScenarios = scenarios.filter(scenario => {
-        console.log('Checking scenario:', scenario);
-        console.log('Position focus:', scenario.positionFocus);
-        return scenario.positionFocus.includes(selectedPosition);
-      });
-      console.log('Filtered scenarios:', relevantScenarios);
-      // Shuffle the filtered scenarios
-      const shuffledScenarios = shuffleArray(relevantScenarios);
-      setScenarios(shuffledScenarios);
+      const relevantScenarios = allScenarios.filter(scenario =>
+        scenario.positionFocus.includes(selectedPosition)
+      );
+      setScenarios(shuffleArray(relevantScenarios));
       setCurrentScenarioIndex(0);
-      const posName = positions.find(p => p.id === selectedPosition)?.name || selectedPosition;
-      resetToDefaultView();
+      setIsSessionModeActive(false);
+      setShowSessionResults(false);
+      setSessionQuestions([]);
+      setCurrentSessionQuestionNum(0);
+      setSessionScore(0);
     } else {
-      // When position is null, reload all scenarios
-      loadScenarios();
-      resetToDefaultView();
+      setScenarios(allScenarios);
+      setCurrentScenarioIndex(0);
+      setIsSessionModeActive(false);
+      setShowSessionResults(false);
+      setSessionQuestions([]);
+      setCurrentSessionQuestionNum(0);
+      setSessionScore(0);
     }
-  }, [selectedPosition]);
+  }, [selectedPosition, allScenarios]);
 
   const getUnusedScenarios = useCallback(() => {
     return scenarios.filter(scenario => !sessionQuestions.some(q => q.id === scenario.id));
   }, [scenarios, sessionQuestions]);
 
+  // Only start a session when the user clicks the button
   const startSession = () => {
     const unusedScenarios = getUnusedScenarios();
-    console.log('Unused scenarios:', unusedScenarios);
     if (unusedScenarios.length === 0) {
       alert("You've completed all available scenarios for this position! Starting over with all scenarios.");
       setSessionQuestions([]);
@@ -137,19 +129,11 @@ function App() {
   };
 
   const handleNextQuestionInSession = () => {
-    console.log('Current question num:', currentSessionQuestionNum);
-    console.log('Total questions:', sessionQuestions.length);
-    console.log('Session questions:', sessionQuestions);
-    
-    // Check if we're at the last question
     if (currentSessionQuestionNum >= sessionQuestions.length) {
-      console.log('Session complete, showing results');
       setIsSessionModeActive(false);
       setShowSessionResults(true);
       return;
     }
-
-    // Move to next question
     setCurrentSessionQuestionNum(prevNum => prevNum + 1);
   };
   
@@ -159,14 +143,7 @@ function App() {
 
   let currentScenarioToDisplay;
   if (isSessionModeActive && sessionQuestions.length > 0) {
-    console.log('Getting scenario for display:', {
-      currentSessionQuestionNum,
-      sessionQuestionsLength: sessionQuestions.length,
-      sessionQuestions
-    });
-    // Subtract 1 from currentSessionQuestionNum since it's 1-based
     currentScenarioToDisplay = sessionQuestions[currentSessionQuestionNum - 1];
-    console.log('Selected scenario for display:', currentScenarioToDisplay);
   } else {
     currentScenarioToDisplay = scenarios[currentScenarioIndex];
   }
