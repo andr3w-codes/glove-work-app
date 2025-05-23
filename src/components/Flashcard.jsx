@@ -91,13 +91,13 @@ function Flashcard({ scenario, onNextScenario, onAnswer, currentScore, totalScen
 
         <div className="space-y-4 mb-8">
           {shuffledOptions.map((option, index) => {
-            let buttonClass = "w-full text-left p-4 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200 transform hover:scale-[1.02]";
+            let buttonClass = "w-full text-left p-4 border border-gray-700 rounded-lg bg-[#23232a] hover:bg-[#2d2d38] focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200 transform hover:scale-[1.02] flex items-center";
             if (showExplanation && selectedOption && selectedOption.index === index) {
               buttonClass += option.isCorrect 
-                ? ' bg-green-50 border-green-400 text-green-700 ring-2 ring-green-400' 
-                : ' bg-red-50 border-red-400 text-red-700 ring-2 ring-red-400';
+                ? ' bg-green-900 border-green-400 text-green-300 ring-2 ring-green-400' 
+                : ' bg-red-900 border-red-400 text-red-300 ring-2 ring-red-400';
             } else if (showExplanation && option.isCorrect) {
-              buttonClass += ' bg-green-50 border-green-300';
+              buttonClass += ' bg-green-900 border-green-300 text-green-300';
             }
             return (
               <button
@@ -106,12 +106,10 @@ function Flashcard({ scenario, onNextScenario, onAnswer, currentScore, totalScen
                 disabled={showExplanation}
                 className={buttonClass}
               >
-                <span className="flex items-center">
-                  <span className="w-6 h-6 flex items-center justify-center bg-gray-100 rounded-full mr-3 text-sm font-medium">
-                    {String.fromCharCode(65 + index)}
-                  </span>
-                  {option.text}
+                <span className="flex items-center min-w-[2.25rem] h-9 justify-center bg-[#18181b] text-gray-100 rounded-full mr-3 text-base font-bold border border-gray-700">
+                  {String.fromCharCode(65 + index)}
                 </span>
+                <span className="break-words text-left">{option.text}</span>
               </button>
             );
           })}
@@ -120,15 +118,15 @@ function Flashcard({ scenario, onNextScenario, onAnswer, currentScore, totalScen
         {showExplanation && (
           <div className={`p-6 rounded-lg mt-6 transform transition-all duration-300 ${
             selectedOption?.isCorrect 
-              ? 'bg-green-50 border border-green-300' 
-              : 'bg-red-50 border border-red-300'
+              ? 'bg-green-900 border border-green-400 text-green-300' 
+              : 'bg-red-900 border border-red-400 text-red-300'
           }`}>
             <h3 className={`text-xl font-bold mb-2 ${
-              selectedOption?.isCorrect ? 'text-green-700' : 'text-red-700'
+              selectedOption?.isCorrect ? 'text-green-300' : 'text-red-300'
             }`}>
               {selectedOption?.isCorrect ? '✓ Correct!' : '✗ Incorrect'}
             </h3>
-            <p className="text-gray-700 mb-6 leading-relaxed">{explanation}</p>
+            <p className="mb-6 leading-relaxed">{explanation}</p>
             <button 
               onClick={handleNext}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-200 transform hover:scale-[1.02]"

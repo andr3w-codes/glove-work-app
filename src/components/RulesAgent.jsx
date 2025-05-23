@@ -65,7 +65,7 @@ const RulesAgent = () => {
                 className={`inline-block p-3 rounded-lg max-w-[95vw] sm:max-w-[80%] text-sm sm:text-base ${
                   message.type === 'user'
                     ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-800'
+                    : 'bg-[#23232a] text-[#f3f4f6]'
                 }`}
               >
                 {message.type === 'ai' ? (

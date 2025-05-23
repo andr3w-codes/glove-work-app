@@ -8,6 +8,7 @@ import Navigation from './components/Navigation';
 import { positions } from './data/positions';
 import './App.css';
 import { db } from './db/clientConfig';
+import gloveWorkLogo from './assets/glove_work.png';
 
 const SESSION_LENGTH = 5;
 
@@ -301,17 +302,11 @@ function App() {
     <div className="min-h-screen bg-baseball flex flex-col">
       <header className="sticky top-0 z-20 bg-white/90 backdrop-blur-sm shadow-sm">
         <div className="max-w-2xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <span className="text-2xl">⚾</span>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
-                Glove Work
-              </h1>
-              <span className="text-2xl">🧢</span>
-            </div>
+          <div className="flex flex-col items-center justify-between">
+            <img src={gloveWorkLogo} alt="Glove Work Logo" className="mx-auto w-full max-w-xs sm:max-w-md md:max-w-lg h-auto block" />
             <Navigation activeView={activeView} setActiveView={setActiveView} />
           </div>
-          <p className="text-sm text-gray-600 mt-1">
+          <p className="text-sm text-gray-600 mt-1 text-center">
             Master the fundamentals, one play at a time
           </p>
         </div>
