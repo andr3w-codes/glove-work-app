@@ -303,7 +303,7 @@ function App() {
       <header className="sticky top-0 z-20 bg-white/90 backdrop-blur-sm shadow-sm">
         <div className="max-w-2xl mx-auto px-4 py-3">
           <div className="flex flex-col items-center justify-between">
-            <img src={gloveWorkLogo} alt="Glove Work Logo" className="mx-auto w-full max-w-xs sm:max-w-md md:max-w-lg h-auto block" />
+            <img src={gloveWorkLogo} alt="Glove Work Logo" className="mx-auto w-full max-w-xs sm:max-w-md md:max-w-lg h-auto block" style={{ filter: 'invert(1) brightness(2)' }} />
             <Navigation activeView={activeView} setActiveView={setActiveView} />
           </div>
           <p className="text-sm text-gray-600 mt-1 text-center">
