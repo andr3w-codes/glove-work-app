@@ -32,8 +32,8 @@ const Navigation = ({ activeView, setActiveView, onResetProgress }) => {
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="pt-16 px-4 pb-16 overflow-y-auto h-full">
-          {/* Added pb-16, overflow-y-auto, and h-full to make the content area scroll if needed, respecting padding. */}
+        <div className="pt-16 px-4 pb-8">
+          {/* Removed h-full and overflow-y-auto to allow content-based height. Adjusted pb to pb-8. */}
           <nav className="space-y-2">
             <button
               onClick={() => handleNavClick('practice')}

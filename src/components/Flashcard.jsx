@@ -11,7 +11,7 @@ function shuffleArray(array) {
   return newArray;
 }
 
-function Flashcard({ scenario, onNextScenario, onAnswer, currentScore, totalScenarios, currentIndex, selectedPosition }) {
+function Flashcard({ scenario, onNextScenario, onAnswer, currentScore, totalScenarios, currentIndex, selectedPosition, completedScenarioIds }) {
   const [showExplanation, setShowExplanation] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -51,6 +51,7 @@ function Flashcard({ scenario, onNextScenario, onAnswer, currentScore, totalScen
   const { situation, question, explanation, baseRunners, outs, ballLocation } = scenario;
   const isLastQuestion = currentIndex + 1 >= totalScenarios;
   const progress = ((currentIndex + 1) / totalScenarios) * 100;
+  const isCompleted = completedScenarioIds && scenario && completedScenarioIds.includes(scenario.id);
 
   return (
     <div className={`max-w-2xl mx-auto transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
@@ -82,6 +83,11 @@ function Flashcard({ scenario, onNextScenario, onAnswer, currentScore, totalScen
         
         <div className="mb-6">
           <p className="text-sm text-gray-500 uppercase tracking-wide font-medium mb-1">Situation:</p>
+          {isCompleted && (
+            <span className="inline-block bg-green-100 text-green-700 text-xs font-semibold mr-2 mb-1 px-2.5 py-0.5 rounded-full">
+              ✅ Completed
+            </span>
+          )}
           <p className="text-lg text-gray-800 leading-relaxed">{situation}</p>
         </div>
         <div className="mb-8">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import PositionSelector from './components/PositionSelector';
 import Flashcard from './components/Flashcard';
 import CustomScenarioForm from './components/CustomScenarioForm';
@@ -40,6 +40,8 @@ function App() {
   const [sessionScore, setSessionScore] = useState(0);
   const [showSessionResults, setShowSessionResults] = useState(false);
   const [completedScenarioIds, setCompletedScenarioIds] = useState([]);
+  const [currentPositionProgress, setCurrentPositionProgress] = useState({ completed: 0, total: 0 });
+  const prevSelectedPositionRef = useRef();
 
   useEffect(() => {
     loadScenarios();
@@ -78,8 +80,11 @@ function App() {
     setSelectedPosition(position);
   };
 
-  // Only filter scenarios and reset session state when a new position is selected or completed IDs change
+  // Filters scenarios based on position and completion status.
+  // Resets session state ONLY if selectedPosition changes or is cleared.
   useEffect(() => {
+    const positionChanged = selectedPosition !== prevSelectedPositionRef.current;
+
     let availableScenarios = [];
     if (selectedPosition) {
       availableScenarios = allScenarios.filter(scenario =>
@@ -90,13 +95,31 @@ function App() {
       availableScenarios = allScenarios.filter(scenario => !completedScenarioIds.includes(scenario.id));
     }
     setScenarios(shuffleArray(availableScenarios));
-    setCurrentScenarioIndex(0); // Reset index when scenarios change
-    // Reset session state as well, as the available pool of questions has changed.
-    setIsSessionModeActive(false);
-    setShowSessionResults(false);
-    setSessionQuestions([]);
-    setCurrentSessionQuestionNum(0);
-    setSessionScore(0);
+    setCurrentScenarioIndex(0); // Reset index for non-session practice view
+
+    // Calculate progress for the selected position
+    if (selectedPosition) {
+      const allForPosition = allScenarios.filter(s => s.positionFocus.includes(selectedPosition));
+      const totalCountForPosition = allForPosition.length;
+      const completedForPosition = allForPosition.filter(s => completedScenarioIds.includes(s.id));
+      const completedCountForPosition = completedForPosition.length;
+      setCurrentPositionProgress({ completed: completedCountForPosition, total: totalCountForPosition });
+    } else {
+      setCurrentPositionProgress({ completed: 0, total: 0 }); // Reset if no position selected
+    }
+
+    // Only reset session-related states if the position actually changed or was cleared.
+    // This prevents completedScenarioIds changes from prematurely ending an active session.
+    if (positionChanged || !selectedPosition) {
+      setIsSessionModeActive(false);
+      setShowSessionResults(false);
+      setSessionQuestions([]);
+      setCurrentSessionQuestionNum(0);
+      setSessionScore(0);
+    }
+
+    // Update ref for the next render
+    prevSelectedPositionRef.current = selectedPosition;
   }, [selectedPosition, allScenarios, completedScenarioIds]);
 
   const getUnusedScenarios = useCallback(() => {
@@ -210,6 +233,11 @@ function App() {
                 <h2 className="text-base sm:text-lg font-semibold text-gray-800">
                   Playing as: <span className="text-blue-600">{positions.find(p => p.id === selectedPosition)?.name || selectedPosition}</span>
                 </h2>
+                {selectedPosition && currentPositionProgress.total > 0 && (
+                  <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                    Progress: {currentPositionProgress.completed} / {currentPositionProgress.total} scenarios completed
+                  </p>
+                )}
               </div>
             )}
 
@@ -243,6 +271,7 @@ function App() {
                   totalScenarios={sessionQuestions.length}
                   currentIndex={currentSessionQuestionNum - 1}
                   selectedPosition={selectedPosition}
+                  completedScenarioIds={completedScenarioIds}
                 />
               </div>
             )}
