@@ -44,11 +44,22 @@ function App() {
   const prevSelectedPositionRef = useRef();
 
   useEffect(() => {
-    loadScenarios();
     const storedCompleted = localStorage.getItem(GLOVEWORK_COMPLETED_SCENARIOS_KEY);
     if (storedCompleted) {
-      setCompletedScenarioIds(JSON.parse(storedCompleted));
+      try {
+        const parsedIds = JSON.parse(storedCompleted);
+        if (Array.isArray(parsedIds)) { // Basic validation
+          setCompletedScenarioIds(parsedIds);
+        } else {
+          console.warn('Stored completed scenarios is not an array:', parsedIds);
+          localStorage.removeItem(GLOVEWORK_COMPLETED_SCENARIOS_KEY); // Clear invalid data
+        }
+      } catch (error) {
+        console.error('Error parsing completed scenarios from localStorage:', error);
+        localStorage.removeItem(GLOVEWORK_COMPLETED_SCENARIOS_KEY); // Clear corrupted data
+      }
     }
+    loadScenarios();
   }, []);
 
   const loadScenarios = async () => {
@@ -88,11 +99,14 @@ function App() {
     let availableScenarios = [];
     if (selectedPosition) {
       availableScenarios = allScenarios.filter(scenario =>
-        scenario.positionFocus.includes(selectedPosition) && !completedScenarioIds.includes(scenario.id)
+        scenario.positionFocus.includes(selectedPosition) && // Keep position focus logic
+        !completedScenarioIds.includes(scenario.id) // Add filtering by completed IDs
       );
     } else {
-      // If no position is selected, filter all scenarios by completedScenarioIds
-      availableScenarios = allScenarios.filter(scenario => !completedScenarioIds.includes(scenario.id));
+      // Filter allScenarios if no position is selected, excluding completed ones
+      availableScenarios = allScenarios.filter(scenario =>
+        !completedScenarioIds.includes(scenario.id)
+      );
     }
     setScenarios(shuffleArray(availableScenarios));
     setCurrentScenarioIndex(0); // Reset index for non-session practice view
@@ -108,8 +122,9 @@ function App() {
       setCurrentPositionProgress({ completed: 0, total: 0 }); // Reset if no position selected
     }
 
-    // Only reset session-related states if the position actually changed or was cleared.
-    // This prevents completedScenarioIds changes from prematurely ending an active session.
+    // Only reset session state if the selected position actually changed,
+    // or if the position is cleared. This prevents completedScenarioIds
+    // changes from breaking an active session.
     if (positionChanged || !selectedPosition) {
       setIsSessionModeActive(false);
       setShowSessionResults(false);
@@ -118,9 +133,8 @@ function App() {
       setSessionScore(0);
     }
 
-    // Update ref for the next render
     prevSelectedPositionRef.current = selectedPosition;
-  }, [selectedPosition, allScenarios, completedScenarioIds]);
+  }, [selectedPosition, allScenarios, completedScenarioIds]); // Add completedScenarioIds to dependencies
 
   const getUnusedScenarios = useCallback(() => {
     return scenarios.filter(scenario => !sessionQuestions.some(q => q.id === scenario.id));
@@ -158,9 +172,9 @@ function App() {
     // Save completed scenario ID
     if (isSessionModeActive && sessionQuestions.length > 0 && currentSessionQuestionNum > 0) {
       const scenarioJustCompleted = sessionQuestions[currentSessionQuestionNum - 1];
-      if (scenarioJustCompleted) {
+      if (scenarioJustCompleted && scenarioJustCompleted.id) {
         const scenarioIdToComplete = scenarioJustCompleted.id;
-        if (scenarioIdToComplete && !completedScenarioIds.includes(scenarioIdToComplete)) {
+        if (!completedScenarioIds.includes(scenarioIdToComplete)) {
           const updatedCompletedIds = [...completedScenarioIds, scenarioIdToComplete];
           setCompletedScenarioIds(updatedCompletedIds);
           localStorage.setItem(GLOVEWORK_COMPLETED_SCENARIOS_KEY, JSON.stringify(updatedCompletedIds));
@@ -185,8 +199,9 @@ function App() {
       localStorage.removeItem(GLOVEWORK_COMPLETED_SCENARIOS_KEY);
       setCompletedScenarioIds([]);
       setSelectedPosition(null); // Reset selected position
-      setActiveView('practice'); // Go back to practice view
-      // The useEffect depending on completedScenarioIds will handle scenario list updates.
+      setActiveView('practice');   // Go back to practice view
+      // The useEffect hook that depends on completedScenarioIds (and selectedPosition)
+      // will automatically re-filter scenarios and update the view.
       alert('Your progress has been reset.');
     }
   };

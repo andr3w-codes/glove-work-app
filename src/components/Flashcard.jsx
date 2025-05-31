@@ -51,7 +51,7 @@ function Flashcard({ scenario, onNextScenario, onAnswer, currentScore, totalScen
   const { situation, question, explanation, baseRunners, outs, ballLocation } = scenario;
   const isLastQuestion = currentIndex + 1 >= totalScenarios;
   const progress = ((currentIndex + 1) / totalScenarios) * 100;
-  const isCompleted = completedScenarioIds && scenario && completedScenarioIds.includes(scenario.id);
+  const isCompleted = completedScenarioIds && scenario && scenario.id && completedScenarioIds.includes(scenario.id);
 
   return (
     <div className={`max-w-2xl mx-auto transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>

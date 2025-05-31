@@ -33,7 +33,6 @@ const Navigation = ({ activeView, setActiveView, onResetProgress }) => {
         }`}
       >
         <div className="pt-16 px-4 pb-8">
-          {/* Removed h-full and overflow-y-auto to allow content-based height. Adjusted pb to pb-8. */}
           <nav className="space-y-2">
             <button
               onClick={() => handleNavClick('practice')}
@@ -75,16 +74,14 @@ const Navigation = ({ activeView, setActiveView, onResetProgress }) => {
             >
               Rules
             </button>
-            {onResetProgress && (
-              <div className="pt-4 mt-4 border-t border-gray-200">
+            {onResetProgress && ( // Conditionally render if the prop is provided
+              <div className="mt-4 pt-4 border-t border-gray-200"> {/* Visual separator */}
                 <button
                   onClick={() => {
-                    if (onResetProgress) {
-                      onResetProgress();
-                    }
-                    setIsOpen(false); // Close menu
+                    onResetProgress();
+                    setIsOpen(false); // Close the menu
                   }}
-                  className="w-full text-left px-4 py-3 rounded-lg bg-red-500 text-white hover:bg-red-600 font-medium transition-colors"
+                  className="w-full text-left px-4 py-3 rounded-lg text-white bg-red-500 hover:bg-red-600 font-medium transition-colors" // Destructive action styling
                 >
                   Reset Progress
                 </button>
