@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import PositionSelector from './components/PositionSelector';
 import Flashcard from './components/Flashcard';
 import CustomScenarioForm from './components/CustomScenarioForm';
@@ -11,7 +11,6 @@ import { db } from './db/clientConfig';
 import gloveWorkLogo from './assets/glove_work.png';
 
 const SESSION_LENGTH = 5;
-const GLOVEWORK_COMPLETED_SCENARIOS_KEY = 'glovework:completedScenarios';
 
 // Helper function to shuffle an array
 function shuffleArray(array) {
@@ -39,26 +38,8 @@ function App() {
   const [currentSessionQuestionNum, setCurrentSessionQuestionNum] = useState(0);
   const [sessionScore, setSessionScore] = useState(0);
   const [showSessionResults, setShowSessionResults] = useState(false);
-  const [completedScenarioIds, setCompletedScenarioIds] = useState([]);
-  const [currentPositionProgress, setCurrentPositionProgress] = useState({ completed: 0, total: 0 });
-  const prevSelectedPositionRef = useRef();
 
   useEffect(() => {
-    const storedCompleted = localStorage.getItem(GLOVEWORK_COMPLETED_SCENARIOS_KEY);
-    if (storedCompleted) {
-      try {
-        const parsedIds = JSON.parse(storedCompleted);
-        if (Array.isArray(parsedIds)) { // Basic validation
-          setCompletedScenarioIds(parsedIds);
-        } else {
-          console.warn('Stored completed scenarios is not an array:', parsedIds);
-          localStorage.removeItem(GLOVEWORK_COMPLETED_SCENARIOS_KEY); // Clear invalid data
-        }
-      } catch (error) {
-        console.error('Error parsing completed scenarios from localStorage:', error);
-        localStorage.removeItem(GLOVEWORK_COMPLETED_SCENARIOS_KEY); // Clear corrupted data
-      }
-    }
     loadScenarios();
   }, []);
 
@@ -91,50 +72,29 @@ function App() {
     setSelectedPosition(position);
   };
 
-  // Filters scenarios based on position and completion status.
-  // Resets session state ONLY if selectedPosition changes or is cleared.
+  // Only filter scenarios and reset session state when a new position is selected
   useEffect(() => {
-    const positionChanged = selectedPosition !== prevSelectedPositionRef.current;
-
-    let availableScenarios = [];
     if (selectedPosition) {
-      availableScenarios = allScenarios.filter(scenario =>
-        scenario.positionFocus.includes(selectedPosition) && // Keep position focus logic
-        !completedScenarioIds.includes(scenario.id) // Add filtering by completed IDs
+      const relevantScenarios = allScenarios.filter(scenario =>
+        scenario.positionFocus.includes(selectedPosition)
       );
+      setScenarios(shuffleArray(relevantScenarios));
+      setCurrentScenarioIndex(0);
+      setIsSessionModeActive(false);
+      setShowSessionResults(false);
+      setSessionQuestions([]);
+      setCurrentSessionQuestionNum(0);
+      setSessionScore(0);
     } else {
-      // Filter allScenarios if no position is selected, excluding completed ones
-      availableScenarios = allScenarios.filter(scenario =>
-        !completedScenarioIds.includes(scenario.id)
-      );
-    }
-    setScenarios(shuffleArray(availableScenarios));
-    setCurrentScenarioIndex(0); // Reset index for non-session practice view
-
-    // Calculate progress for the selected position
-    if (selectedPosition) {
-      const allForPosition = allScenarios.filter(s => s.positionFocus.includes(selectedPosition));
-      const totalCountForPosition = allForPosition.length;
-      const completedForPosition = allForPosition.filter(s => completedScenarioIds.includes(s.id));
-      const completedCountForPosition = completedForPosition.length;
-      setCurrentPositionProgress({ completed: completedCountForPosition, total: totalCountForPosition });
-    } else {
-      setCurrentPositionProgress({ completed: 0, total: 0 }); // Reset if no position selected
-    }
-
-    // Only reset session state if the selected position actually changed,
-    // or if the position is cleared. This prevents completedScenarioIds
-    // changes from breaking an active session.
-    if (positionChanged || !selectedPosition) {
+      setScenarios(allScenarios);
+      setCurrentScenarioIndex(0);
       setIsSessionModeActive(false);
       setShowSessionResults(false);
       setSessionQuestions([]);
       setCurrentSessionQuestionNum(0);
       setSessionScore(0);
     }
-
-    prevSelectedPositionRef.current = selectedPosition;
-  }, [selectedPosition, allScenarios, completedScenarioIds]); // Add completedScenarioIds to dependencies
+  }, [selectedPosition, allScenarios]);
 
   const getUnusedScenarios = useCallback(() => {
     return scenarios.filter(scenario => !sessionQuestions.some(q => q.id === scenario.id));
@@ -169,19 +129,6 @@ function App() {
   };
 
   const handleNextQuestionInSession = () => {
-    // Save completed scenario ID
-    if (isSessionModeActive && sessionQuestions.length > 0 && currentSessionQuestionNum > 0) {
-      const scenarioJustCompleted = sessionQuestions[currentSessionQuestionNum - 1];
-      if (scenarioJustCompleted && scenarioJustCompleted.id) {
-        const scenarioIdToComplete = scenarioJustCompleted.id;
-        if (!completedScenarioIds.includes(scenarioIdToComplete)) {
-          const updatedCompletedIds = [...completedScenarioIds, scenarioIdToComplete];
-          setCompletedScenarioIds(updatedCompletedIds);
-          localStorage.setItem(GLOVEWORK_COMPLETED_SCENARIOS_KEY, JSON.stringify(updatedCompletedIds));
-        }
-      }
-    }
-
     if (currentSessionQuestionNum >= sessionQuestions.length) {
       setIsSessionModeActive(false);
       setShowSessionResults(true);
@@ -192,18 +139,6 @@ function App() {
   
   const handleNextScenarioInSession = () => {
     setCurrentScenarioIndex((prev) => (prev + 1) % scenarios.length);
-  };
-
-  const handleResetProgress = () => {
-    if (window.confirm('Are you sure you want to reset all your progress? This action cannot be undone.')) {
-      localStorage.removeItem(GLOVEWORK_COMPLETED_SCENARIOS_KEY);
-      setCompletedScenarioIds([]);
-      setSelectedPosition(null); // Reset selected position
-      setActiveView('practice');   // Go back to practice view
-      // The useEffect hook that depends on completedScenarioIds (and selectedPosition)
-      // will automatically re-filter scenarios and update the view.
-      alert('Your progress has been reset.');
-    }
   };
 
   let currentScenarioToDisplay;
@@ -248,11 +183,6 @@ function App() {
                 <h2 className="text-base sm:text-lg font-semibold text-gray-800">
                   Playing as: <span className="text-blue-600">{positions.find(p => p.id === selectedPosition)?.name || selectedPosition}</span>
                 </h2>
-                {selectedPosition && currentPositionProgress.total > 0 && (
-                  <p className="text-xs sm:text-sm text-gray-600 mt-1">
-                    Progress: {currentPositionProgress.completed} / {currentPositionProgress.total} scenarios completed
-                  </p>
-                )}
               </div>
             )}
 
@@ -286,7 +216,6 @@ function App() {
                   totalScenarios={sessionQuestions.length}
                   currentIndex={currentSessionQuestionNum - 1}
                   selectedPosition={selectedPosition}
-                  completedScenarioIds={completedScenarioIds}
                 />
               </div>
             )}
@@ -352,7 +281,7 @@ function App() {
         <div className="max-w-2xl mx-auto px-4 py-3">
           <div className="flex flex-col items-center justify-between">
             <img src={gloveWorkLogo} alt="Glove Work Logo" className="mx-auto w-full max-w-xs sm:max-w-md md:max-w-lg h-auto block" style={{ filter: 'invert(1) brightness(2)' }} />
-            <Navigation activeView={activeView} setActiveView={setActiveView} onResetProgress={handleResetProgress} />
+            <Navigation activeView={activeView} setActiveView={setActiveView} />
           </div>
           <p className="text-sm text-gray-600 mt-1 text-center">
             Master the fundamentals, one play at a time
