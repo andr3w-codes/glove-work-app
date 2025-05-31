@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const Navigation = ({ activeView, setActiveView, onResetProgress }) => {
+const Navigation = ({ activeView, setActiveView }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -32,7 +32,7 @@ const Navigation = ({ activeView, setActiveView, onResetProgress }) => {
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="pt-16 px-4 pb-8">
+        <div className="pt-16 px-4">
           <nav className="space-y-2">
             <button
               onClick={() => handleNavClick('practice')}
@@ -74,19 +74,6 @@ const Navigation = ({ activeView, setActiveView, onResetProgress }) => {
             >
               Rules
             </button>
-            {onResetProgress && ( // Conditionally render if the prop is provided
-              <div className="mt-4 pt-4 border-t border-gray-200"> {/* Visual separator */}
-                <button
-                  onClick={() => {
-                    onResetProgress();
-                    setIsOpen(false); // Close the menu
-                  }}
-                  className="w-full text-left px-4 py-3 rounded-lg text-white bg-red-500 hover:bg-red-600 font-medium transition-colors" // Destructive action styling
-                >
-                  Reset Progress
-                </button>
-              </div>
-            )}
           </nav>
         </div>
       </div>
