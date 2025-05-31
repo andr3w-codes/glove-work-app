@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const Navigation = ({ activeView, setActiveView }) => {
+const Navigation = ({ activeView, setActiveView, onResetProgress }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -32,7 +32,8 @@ const Navigation = ({ activeView, setActiveView }) => {
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="pt-16 px-4">
+        <div className="pt-16 px-4 pb-16 overflow-y-auto h-full">
+          {/* Added pb-16, overflow-y-auto, and h-full to make the content area scroll if needed, respecting padding. */}
           <nav className="space-y-2">
             <button
               onClick={() => handleNavClick('practice')}
@@ -74,6 +75,21 @@ const Navigation = ({ activeView, setActiveView }) => {
             >
               Rules
             </button>
+            {onResetProgress && (
+              <div className="pt-4 mt-4 border-t border-gray-200">
+                <button
+                  onClick={() => {
+                    if (onResetProgress) {
+                      onResetProgress();
+                    }
+                    setIsOpen(false); // Close menu
+                  }}
+                  className="w-full text-left px-4 py-3 rounded-lg bg-red-500 text-white hover:bg-red-600 font-medium transition-colors"
+                >
+                  Reset Progress
+                </button>
+              </div>
+            )}
           </nav>
         </div>
       </div>
