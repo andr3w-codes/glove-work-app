@@ -11,6 +11,7 @@ import { db } from './db/clientConfig';
 import gloveWorkLogo from './assets/glove_work.png';
 
 const SESSION_LENGTH = 5;
+const GLOVEWORK_COMPLETED_SCENARIOS_KEY = 'glovework:completedScenarios';
 
 // Helper function to shuffle an array
 function shuffleArray(array) {
@@ -38,9 +39,14 @@ function App() {
   const [currentSessionQuestionNum, setCurrentSessionQuestionNum] = useState(0);
   const [sessionScore, setSessionScore] = useState(0);
   const [showSessionResults, setShowSessionResults] = useState(false);
+  const [completedScenarioIds, setCompletedScenarioIds] = useState([]);
 
   useEffect(() => {
     loadScenarios();
+    const storedCompleted = localStorage.getItem(GLOVEWORK_COMPLETED_SCENARIOS_KEY);
+    if (storedCompleted) {
+      setCompletedScenarioIds(JSON.parse(storedCompleted));
+    }
   }, []);
 
   const loadScenarios = async () => {
@@ -72,29 +78,26 @@ function App() {
     setSelectedPosition(position);
   };
 
-  // Only filter scenarios and reset session state when a new position is selected
+  // Only filter scenarios and reset session state when a new position is selected or completed IDs change
   useEffect(() => {
+    let availableScenarios = [];
     if (selectedPosition) {
-      const relevantScenarios = allScenarios.filter(scenario =>
-        scenario.positionFocus.includes(selectedPosition)
+      availableScenarios = allScenarios.filter(scenario =>
+        scenario.positionFocus.includes(selectedPosition) && !completedScenarioIds.includes(scenario.id)
       );
-      setScenarios(shuffleArray(relevantScenarios));
-      setCurrentScenarioIndex(0);
-      setIsSessionModeActive(false);
-      setShowSessionResults(false);
-      setSessionQuestions([]);
-      setCurrentSessionQuestionNum(0);
-      setSessionScore(0);
     } else {
-      setScenarios(allScenarios);
-      setCurrentScenarioIndex(0);
-      setIsSessionModeActive(false);
-      setShowSessionResults(false);
-      setSessionQuestions([]);
-      setCurrentSessionQuestionNum(0);
-      setSessionScore(0);
+      // If no position is selected, filter all scenarios by completedScenarioIds
+      availableScenarios = allScenarios.filter(scenario => !completedScenarioIds.includes(scenario.id));
     }
-  }, [selectedPosition, allScenarios]);
+    setScenarios(shuffleArray(availableScenarios));
+    setCurrentScenarioIndex(0); // Reset index when scenarios change
+    // Reset session state as well, as the available pool of questions has changed.
+    setIsSessionModeActive(false);
+    setShowSessionResults(false);
+    setSessionQuestions([]);
+    setCurrentSessionQuestionNum(0);
+    setSessionScore(0);
+  }, [selectedPosition, allScenarios, completedScenarioIds]);
 
   const getUnusedScenarios = useCallback(() => {
     return scenarios.filter(scenario => !sessionQuestions.some(q => q.id === scenario.id));
@@ -129,6 +132,19 @@ function App() {
   };
 
   const handleNextQuestionInSession = () => {
+    // Save completed scenario ID
+    if (isSessionModeActive && sessionQuestions.length > 0 && currentSessionQuestionNum > 0) {
+      const scenarioJustCompleted = sessionQuestions[currentSessionQuestionNum - 1];
+      if (scenarioJustCompleted) {
+        const scenarioIdToComplete = scenarioJustCompleted.id;
+        if (scenarioIdToComplete && !completedScenarioIds.includes(scenarioIdToComplete)) {
+          const updatedCompletedIds = [...completedScenarioIds, scenarioIdToComplete];
+          setCompletedScenarioIds(updatedCompletedIds);
+          localStorage.setItem(GLOVEWORK_COMPLETED_SCENARIOS_KEY, JSON.stringify(updatedCompletedIds));
+        }
+      }
+    }
+
     if (currentSessionQuestionNum >= sessionQuestions.length) {
       setIsSessionModeActive(false);
       setShowSessionResults(true);
@@ -139,6 +155,17 @@ function App() {
   
   const handleNextScenarioInSession = () => {
     setCurrentScenarioIndex((prev) => (prev + 1) % scenarios.length);
+  };
+
+  const handleResetProgress = () => {
+    if (window.confirm('Are you sure you want to reset all your progress? This action cannot be undone.')) {
+      localStorage.removeItem(GLOVEWORK_COMPLETED_SCENARIOS_KEY);
+      setCompletedScenarioIds([]);
+      setSelectedPosition(null); // Reset selected position
+      setActiveView('practice'); // Go back to practice view
+      // The useEffect depending on completedScenarioIds will handle scenario list updates.
+      alert('Your progress has been reset.');
+    }
   };
 
   let currentScenarioToDisplay;
@@ -281,7 +308,7 @@ function App() {
         <div className="max-w-2xl mx-auto px-4 py-3">
           <div className="flex flex-col items-center justify-between">
             <img src={gloveWorkLogo} alt="Glove Work Logo" className="mx-auto w-full max-w-xs sm:max-w-md md:max-w-lg h-auto block" style={{ filter: 'invert(1) brightness(2)' }} />
-            <Navigation activeView={activeView} setActiveView={setActiveView} />
+            <Navigation activeView={activeView} setActiveView={setActiveView} onResetProgress={handleResetProgress} />
           </div>
           <p className="text-sm text-gray-600 mt-1 text-center">
             Master the fundamentals, one play at a time
