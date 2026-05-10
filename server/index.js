@@ -55,43 +55,18 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const SYSTEM_PROMPT = `You are a helpful assistant that answers questions about Little League baseball rules. 
-Your responses should be:
-1. Accurate and based on official Little League rules
-2. Clear and easy to understand
-3. Include relevant context and examples
-4. Cite official sources when possible
+const SYSTEM_PROMPT = `You are a helpful assistant that answers questions about Little League baseball rules.
+Search littleleague.org for current, official rules before answering. Always base your answer on what you find there.
 
-Your persona is a hyped up, enthusiastic, and friendly Little League coach. You are explaining the rules to parents and players.
+Your persona is a hyped up, enthusiastic, and friendly Little League coach explaining rules to parents and players.
 
-Format your response in HTML with the following structure:
-- Start with a brief, direct answer in a paragraph
-- Use h2 and h3 tags for main sections
-- Use ul and li tags for lists
-- Use strong tags for important terms
-- Use table tags when presenting structured data
-- Include relevant examples in pre tags
-- End with a "For more information" section with official sources
-
-Example format:
-<h2>Direct Answer</h2>
-<p>Brief, clear answer to the question.</p>
-
-<h2>Details</h2>
-<ul>
-  <li>Key point 1</li>
-  <li>Key point 2</li>
-  <li>Key point 3</li>
-</ul>
-
-<h2>Examples</h2>
-<pre>
-Example situation:
-What happens: ...
-</pre>
-
-<h2>For More Information</h2>
-<a href="https://www.littleleague.org/playing-rules/">Official Rule Source</a>`;
+Format your response in HTML:
+- Start with a brief, direct answer in a <p> tag
+- Use <h2> and <h3> for sections
+- Use <ul> and <li> for lists
+- Use <strong> for important terms
+- Use <table> when presenting structured data
+- Include real examples in <pre> tags`;
 
 // API endpoint
 app.post('/api/rules/ask', async (req, res) => {
@@ -103,28 +78,21 @@ app.post('/api/rules/ask', async (req, res) => {
     }
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o-mini-search-preview",
+      web_search_options: { search_context_size: "medium" },
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: question }
       ],
-      max_completion_tokens: 1000,
     });
 
-    const answer = completion.choices[0].message.content;
+    const message = completion.choices[0].message;
+    const content = message.content;
 
-    // Parse HTML anchor tags to extract sources
-    const sources = [];
-    const sourceRegex = /<a\s+[^>]*href="([^"]+)"[^>]*>([^<]+)<\/a>/gi;
-    let match;
-    while ((match = sourceRegex.exec(answer)) !== null) {
-      sources.push({
-        title: match[2],
-        url: match[1]
-      });
-    }
-
-    const content = answer;
+    // Extract sources from web search annotations
+    const sources = (message.annotations ?? [])
+      .filter(a => a.type === "url_citation")
+      .map(a => ({ title: a.url_citation.title, url: a.url_citation.url }));
 
     res.json({
       content,
