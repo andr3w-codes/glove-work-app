@@ -108,7 +108,6 @@ app.post('/api/rules/ask', async (req, res) => {
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: question }
       ],
-      temperature: 0.7,
       max_completion_tokens: 1000,
     });
 
