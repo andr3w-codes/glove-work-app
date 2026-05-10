@@ -1,10 +1,8 @@
 import { useState } from 'react';
 
 const NAV_ITEMS = [
-  { id: 'practice',    label: '⚾ Practice'        },
-  { id: 'rules',       label: '📖 Rules Assistant' },
-  { id: 'create',      label: '✏️ Create Scenario' },
-  { id: 'leaderboard', label: '🏆 Leaderboard'     },
+  { id: 'practice', label: '⚾ Practice'        },
+  { id: 'rules',    label: '📖 Rules Assistant' },
 ];
 
 const Navigation = ({ activeView, setActiveView }) => {
