@@ -103,7 +103,7 @@ app.post('/api/rules/ask', async (req, res) => {
     }
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4-turbo-preview",
+      model: "gpt-5-nano",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: question }
