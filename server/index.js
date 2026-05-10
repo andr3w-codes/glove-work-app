@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import { OpenAI } from 'openai';
-import { marked } from 'marked';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -88,7 +87,7 @@ app.post('/api/rules/ask', async (req, res) => {
     });
 
     const message = completion.choices[0].message;
-    const content = marked.parse(message.content ?? '');
+    const content = message.content ?? '';
 
     // Extract sources from web search annotations
     const sources = (message.annotations ?? [])

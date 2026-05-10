@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { askQuestion } from '../api/rules';
 
 const RulesAgent = () => {
@@ -8,13 +9,7 @@ const RulesAgent = () => {
   const [chatHistory, setChatHistory] = useState([
     {
       type: 'ai',
-      content: `<h2>Welcome to the Little League Rules Assistant!</h2>
-        <p>Ask me any question about Little League baseball rules, pitch counts, infield fly, or other scenarios. I'll do my best to provide clear, official, and helpful answers.</p>
-        <ul>
-          <li>Try: <strong>What are the pitch count rules for 11-year-olds?</strong></li>
-          <li>Try: <strong>Explain the infield fly rule</strong></li>
-        </ul>
-        <p>For official rules, see the resources below.</p>`,
+      content: `## Welcome to the Little League Rules Assistant!\n\nAsk me any question about Little League baseball rules, pitch counts, infield fly, or other scenarios. I'll do my best to provide clear, official, and helpful answers.\n\n- Try: **What are the pitch count rules for 11-year-olds?**\n- Try: **Explain the infield fly rule**\n\nFor official rules, see the resources below.`,
       sources: []
     }
   ]);
@@ -70,14 +65,12 @@ const RulesAgent = () => {
               >
                 {message.type === 'ai' ? (
                   <>
-                    <div 
-                      className="prose max-w-none prose-pre:whitespace-pre-wrap prose-pre:break-words prose-pre:overflow-x-auto prose-pre:bg-gray-50 prose-pre:p-2 prose-pre:rounded"
-                      style={{ 
-                        wordBreak: 'break-word',
-                        overflowWrap: 'break-word'
-                      }}
-                      dangerouslySetInnerHTML={{ __html: message.content }}
-                    />
+                    <div
+                      className="prose prose-invert max-w-none prose-pre:whitespace-pre-wrap prose-pre:break-words prose-pre:overflow-x-auto prose-pre:bg-gray-900 prose-pre:p-2 prose-pre:rounded"
+                      style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
+                    >
+                      <ReactMarkdown>{message.content}</ReactMarkdown>
+                    </div>
                     {message.sources && message.sources.length > 0 && (
                       <div className="mt-4 pt-4 border-t border-gray-200">
                         <h4 className="text-sm font-semibold text-gray-700 mb-2">Sources:</h4>
