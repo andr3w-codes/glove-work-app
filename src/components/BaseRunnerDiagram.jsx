@@ -159,7 +159,7 @@ function BaseRunnerDiagram({ baseRunners, outs, ballLocation, onBallLocationSele
           <circle cx="100" cy="200" r="10" fill="#3B82F6" stroke="white" strokeWidth="2" filter="url(#runnerGlow)" />
         )}
 
-        {/* Ball */}
+        {/* Ball path + ball */}
         {ballTarget && (
           isInteractive ? (
             <circle
@@ -172,17 +172,42 @@ function BaseRunnerDiagram({ baseRunners, outs, ballLocation, onBallLocationSele
               filter="url(#ballShadow)"
             />
           ) : (
-            <motion.circle
-              key={ballKey}
-              initial={{ cx: 200, cy: 305 }}
-              animate={{ cx: ballTarget.x, cy: ballTarget.y }}
-              transition={{ type: 'spring', stiffness: 55, damping: 14 }}
-              r="8"
-              fill="white"
-              stroke="#444"
-              strokeWidth="1.5"
-              filter="url(#ballShadow)"
-            />
+            <g key={ballKey}>
+              {/* Layer 1: drawing animation — solid line that unrolls along the path */}
+              <motion.path
+                d={`M 200 305 L ${ballTarget.x} ${ballTarget.y}`}
+                stroke="rgba(255, 230, 80, 0.55)"
+                strokeWidth="3"
+                strokeLinecap="round"
+                fill="none"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.45, ease: 'easeOut' }}
+              />
+              {/* Layer 2: dashed trail — fades in as drawing animation finishes */}
+              <motion.path
+                d={`M 200 305 L ${ballTarget.x} ${ballTarget.y}`}
+                stroke="rgba(255, 230, 80, 0.75)"
+                strokeWidth="2"
+                strokeDasharray="7 5"
+                strokeLinecap="round"
+                fill="none"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.35, duration: 0.2 }}
+              />
+              {/* Layer 3: ball with spring physics */}
+              <motion.circle
+                initial={{ cx: 200, cy: 305 }}
+                animate={{ cx: ballTarget.x, cy: ballTarget.y }}
+                transition={{ type: 'spring', stiffness: 55, damping: 14 }}
+                r="8"
+                fill="white"
+                stroke="#444"
+                strokeWidth="1.5"
+                filter="url(#ballShadow)"
+              />
+            </g>
           )
         )}
       </svg>
