@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useAnimation } from 'framer-motion';
 
-// Fielder position labels with their coordinates on the 400x400 SVG
 const FIELDER_POSITIONS = {
   P:    { num: 1, x: 200, y: 196 },
   C:    { num: 2, x: 200, y: 340 },
@@ -14,19 +13,63 @@ const FIELDER_POSITIONS = {
   RF:   { num: 9, x: 320, y: 86  },
 };
 
+const BALL_ORIGIN = { x: 200, y: 305 };
+
 function BaseRunnerDiagram({ baseRunners, outs, ballLocation, onBallLocationSelect, isInteractive = false, selectedPosition }) {
   const [ballTarget, setBallTarget] = useState(null);
-  const [ballKey, setBallKey] = useState(0);
   const svgRef = useRef(null);
+
+  const ballControls = useAnimation();
+  const drawControls = useAnimation();
+  const trailControls = useAnimation();
 
   useEffect(() => {
     if (ballLocation) {
       setBallTarget(ballLocation);
-      setBallKey(k => k + 1);
     } else if (isInteractive) {
-      setBallTarget({ x: 200, y: 305 });
+      setBallTarget({ x: BALL_ORIGIN.x, y: BALL_ORIGIN.y });
     }
   }, [ballLocation, isInteractive]);
+
+  // Orchestrated animation loop — runs whenever ballTarget changes
+  useEffect(() => {
+    if (!ballTarget || isInteractive) return;
+
+    const dx = ballTarget.x - BALL_ORIGIN.x;
+    const dy = ballTarget.y - BALL_ORIGIN.y;
+    let active = true;
+
+    const loop = async () => {
+      while (active) {
+        // Snap everything back to start
+        ballControls.set({ x: 0, y: 0 });
+        drawControls.set({ pathLength: 0 });
+        trailControls.set({ opacity: 0 });
+
+        // Ball travels + line draws simultaneously
+        await Promise.all([
+          ballControls.start({ x: dx, y: dy, transition: { duration: 0.55, ease: [0.2, 0, 0.35, 1] } }),
+          drawControls.start({ pathLength: 1, transition: { duration: 0.5, ease: 'easeOut' } }),
+        ]);
+
+        if (!active) break;
+
+        // Dashed trail fades in
+        await trailControls.start({ opacity: 1, transition: { duration: 0.15 } });
+
+        // Hold at destination
+        await new Promise(r => setTimeout(r, 950));
+        if (!active) break;
+
+        // Fade trail out before reset
+        await trailControls.start({ opacity: 0, transition: { duration: 0.2 } });
+        await new Promise(r => setTimeout(r, 120));
+      }
+    };
+
+    loop();
+    return () => { active = false; };
+  }, [ballTarget]);
 
   const handleClick = (event) => {
     if (!isInteractive) return;
@@ -37,6 +80,8 @@ function BaseRunnerDiagram({ baseRunners, outs, ballLocation, onBallLocationSele
     setBallTarget({ x, y });
     if (onBallLocationSelect) onBallLocationSelect({ x, y });
   };
+
+  const pathD = ballTarget ? `M ${BALL_ORIGIN.x} ${BALL_ORIGIN.y} L ${ballTarget.x} ${ballTarget.y}` : '';
 
   return (
     <div className="relative w-72 h-72 mx-auto mb-6">
@@ -103,40 +148,30 @@ function BaseRunnerDiagram({ baseRunners, outs, ballLocation, onBallLocationSele
 
         {/* Pitcher's mound */}
         <circle cx="200" cy="200" r="13" fill="#c9975c" stroke="#9e6e38" strokeWidth="1.5" />
-        {/* Rubber */}
         <rect x="192" y="198" width="16" height="5" rx="1" fill="white" opacity="0.9" />
 
-        {/* 2nd base */}
-        <rect x="192" y="92" width="16" height="16" transform="rotate(45 200 100)" fill="white" stroke="#ccc" strokeWidth="1" />
-        {/* 1st base */}
+        {/* Bases */}
+        <rect x="192" y="92"  width="16" height="16" transform="rotate(45 200 100)" fill="white" stroke="#ccc" strokeWidth="1" />
         <rect x="292" y="192" width="16" height="16" transform="rotate(45 300 200)" fill="white" stroke="#ccc" strokeWidth="1" />
-        {/* 3rd base */}
-        <rect x="92" y="192" width="16" height="16" transform="rotate(45 100 200)" fill="white" stroke="#ccc" strokeWidth="1" />
+        <rect x="92"  y="192" width="16" height="16" transform="rotate(45 100 200)" fill="white" stroke="#ccc" strokeWidth="1" />
 
-        {/* Home plate (pentagon) */}
-        <polygon
-          points="200,318 212,308 212,293 188,293 188,308"
-          fill="white"
-          stroke="#ccc"
-          strokeWidth="1"
-        />
+        {/* Home plate */}
+        <polygon points="200,318 212,308 212,293 188,293 188,308" fill="white" stroke="#ccc" strokeWidth="1" />
 
-        {/* Fielder position labels (hidden in interactive/creation mode) */}
+        {/* Fielder position labels */}
         {!isInteractive && Object.entries(FIELDER_POSITIONS).map(([pos, { num, x, y }]) => {
           const isSelected = selectedPosition === pos;
           return (
             <g key={pos}>
               <circle
-                cx={x}
-                cy={y}
+                cx={x} cy={y}
                 r={isSelected ? 11 : 9}
                 fill={isSelected ? '#f59e0b' : 'rgba(0,0,0,0.4)'}
                 stroke={isSelected ? '#d97706' : 'rgba(255,255,255,0.25)'}
                 strokeWidth={isSelected ? 1.5 : 1}
               />
               <text
-                x={x}
-                y={y + 4}
+                x={x} y={y + 4}
                 textAnchor="middle"
                 fontSize={isSelected ? 10 : 9}
                 fontWeight="bold"
@@ -149,66 +184,60 @@ function BaseRunnerDiagram({ baseRunners, outs, ballLocation, onBallLocationSele
         })}
 
         {/* Base runners */}
-        {baseRunners.first && (
-          <circle cx="300" cy="200" r="10" fill="#3B82F6" stroke="white" strokeWidth="2" filter="url(#runnerGlow)" />
-        )}
-        {baseRunners.second && (
-          <circle cx="200" cy="100" r="10" fill="#3B82F6" stroke="white" strokeWidth="2" filter="url(#runnerGlow)" />
-        )}
-        {baseRunners.third && (
-          <circle cx="100" cy="200" r="10" fill="#3B82F6" stroke="white" strokeWidth="2" filter="url(#runnerGlow)" />
-        )}
+        {baseRunners.first  && <circle cx="300" cy="200" r="10" fill="#3B82F6" stroke="white" strokeWidth="2" filter="url(#runnerGlow)" />}
+        {baseRunners.second && <circle cx="200" cy="100" r="10" fill="#3B82F6" stroke="white" strokeWidth="2" filter="url(#runnerGlow)" />}
+        {baseRunners.third  && <circle cx="100" cy="200" r="10" fill="#3B82F6" stroke="white" strokeWidth="2" filter="url(#runnerGlow)" />}
 
-        {/* Ball path + ball */}
-        {ballTarget && (
-          isInteractive ? (
-            <circle
-              cx={ballTarget.x}
-              cy={ballTarget.y}
-              r="8"
-              fill="white"
-              stroke="#444"
-              strokeWidth="1.5"
-              filter="url(#ballShadow)"
+        {/* Ball animation layers */}
+        {ballTarget && !isInteractive && (
+          <>
+            {/* Layer 1: solid line that draws from home to destination */}
+            <motion.path
+              d={pathD}
+              stroke="rgba(255, 230, 80, 0.5)"
+              strokeWidth="3"
+              strokeLinecap="round"
+              fill="none"
+              animate={drawControls}
+              initial={{ pathLength: 0 }}
             />
-          ) : (
-            <g key={ballKey}>
-              {/* Layer 1: drawing animation — solid line that unrolls along the path */}
-              <motion.path
-                d={`M 200 305 L ${ballTarget.x} ${ballTarget.y}`}
-                stroke="rgba(255, 230, 80, 0.55)"
-                strokeWidth="3"
-                strokeLinecap="round"
-                fill="none"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 0.45, ease: 'easeOut', repeat: Infinity, repeatDelay: 1.1 }}
-              />
-              {/* Layer 2: dashed trail — fades in then out each cycle */}
-              <motion.path
-                d={`M 200 305 L ${ballTarget.x} ${ballTarget.y}`}
-                stroke="rgba(255, 230, 80, 0.75)"
-                strokeWidth="2"
-                strokeDasharray="7 5"
-                strokeLinecap="round"
-                fill="none"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 1, 1, 0] }}
-                transition={{ delay: 0.35, duration: 1.2, times: [0, 0.15, 0.75, 1], repeat: Infinity, repeatDelay: 0 }}
-              />
-              {/* Layer 3: ball travels then resets */}
-              <motion.circle
-                initial={{ cx: 200, cy: 305 }}
-                animate={{ cx: [200, ballTarget.x, ballTarget.x, 200], cy: [305, ballTarget.y, ballTarget.y, 305] }}
-                transition={{ duration: 1.55, times: [0, 0.3, 0.8, 1], ease: 'easeOut', repeat: Infinity, repeatDelay: 0 }}
+            {/* Layer 2: dashed trail that fades in once ball arrives */}
+            <motion.path
+              d={pathD}
+              stroke="rgba(255, 230, 80, 0.85)"
+              strokeWidth="2"
+              strokeDasharray="7 5"
+              strokeLinecap="round"
+              fill="none"
+              animate={trailControls}
+              initial={{ opacity: 0 }}
+            />
+            {/* Layer 3: ball — translated via CSS transform on a group */}
+            <motion.g animate={ballControls} initial={{ x: 0, y: 0 }}>
+              <circle
+                cx={BALL_ORIGIN.x}
+                cy={BALL_ORIGIN.y}
                 r="8"
                 fill="white"
                 stroke="#444"
                 strokeWidth="1.5"
                 filter="url(#ballShadow)"
               />
-            </g>
-          )
+            </motion.g>
+          </>
+        )}
+
+        {/* Static ball for interactive/creation mode */}
+        {ballTarget && isInteractive && (
+          <circle
+            cx={ballTarget.x}
+            cy={ballTarget.y}
+            r="8"
+            fill="white"
+            stroke="#444"
+            strokeWidth="1.5"
+            filter="url(#ballShadow)"
+          />
         )}
       </svg>
 
