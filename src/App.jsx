@@ -159,13 +159,23 @@ function App() {
       case 'practice':
       default:
         if (isLoading) {
-          return <div className="text-center">Loading scenarios...</div>;
+          return (
+            <div className="flex flex-col items-center justify-center h-40 gap-3">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500" />
+              <p className="text-gray-500 text-sm">Loading scenarios…</p>
+            </div>
+          );
         }
         if (error) {
-          return <div className="text-center text-red-500">{error}</div>;
+          return (
+            <div className="mt-4 p-4 bg-red-900/40 border border-red-700 rounded-lg text-center">
+              <p className="text-red-300">{error}</p>
+              <button onClick={loadScenarios} className="mt-3 btn-primary text-sm">Retry</button>
+            </div>
+          );
         }
-        if (scenarios.length === 0) {
-          return <div className="text-center">No scenarios available.</div>;
+        if (scenarios.length === 0 && !selectedPosition) {
+          return null;
         }
         return (
           <>
@@ -179,9 +189,9 @@ function App() {
             )}
 
             {selectedPosition && scenarios.length > 0 && !showSessionResults && (
-              <div className="mt-2 mb-2 p-2 bg-white shadow rounded-lg text-center hover-lift">
-                <h2 className="text-base sm:text-lg font-semibold text-gray-800">
-                  Playing as: <span className="text-blue-600">{positions.find(p => p.id === selectedPosition)?.name || selectedPosition}</span>
+              <div className="mt-2 mb-2 p-2 bg-[#23232a] border border-[#333642] rounded-lg text-center">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-200">
+                  Playing as: <span className="text-blue-400">{positions.find(p => p.id === selectedPosition)?.name || selectedPosition}</span>
                 </h2>
               </div>
             )}
@@ -198,11 +208,11 @@ function App() {
             )}
 
             {isSessionModeActive && currentSessionQuestionNum > 0 && sessionQuestions.length > 0 && (
-              <div className="text-center mb-2 p-2 bg-yellow-100 border border-yellow-300 rounded-lg animate-fade-in">
-                <p className="text-sm sm:text-base font-semibold text-yellow-800">
+              <div className="text-center mb-2 p-2 bg-blue-900/40 border border-blue-700 rounded-lg animate-fade-in">
+                <p className="text-sm sm:text-base font-semibold text-blue-200">
                   Question {currentSessionQuestionNum} of {sessionQuestions.length}
                 </p>
-                <p className="text-xs sm:text-sm text-yellow-700">Score: {sessionScore}</p>
+                <p className="text-xs sm:text-sm text-blue-300">Score: {sessionScore}</p>
               </div>
             )}
 
@@ -221,20 +231,20 @@ function App() {
             )}
 
             {showSessionResults && (
-              <div className="mt-4 p-4 bg-white shadow-xl rounded-lg text-center animate-fade-in">
-                <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-2">Session Over!</h2>
-                <p className="text-base sm:text-lg text-gray-800 mb-1">
-                  You played as {positions.find(p => p.id === selectedPosition)?.name || selectedPosition}.
+              <div className="mt-4 p-6 bg-[#23232a] border border-[#333642] rounded-lg text-center animate-fade-in">
+                <h2 className="text-xl sm:text-2xl font-bold text-blue-400 mb-2">Session Complete!</h2>
+                <p className="text-sm sm:text-base text-gray-400 mb-1">
+                  {positions.find(p => p.id === selectedPosition)?.name || selectedPosition}
                 </p>
-                <p className="text-2xl sm:text-3xl font-semibold text-green-600 mb-4">
-                  Your Score: {sessionScore} / {sessionQuestions.length}
+                <p className="text-3xl sm:text-4xl font-bold text-white mb-1">
+                  {sessionScore} <span className="text-gray-500 text-xl font-normal">/ {sessionQuestions.length}</span>
                 </p>
-                <div className="space-x-2 sm:space-x-4">
-                  <button
-                    onClick={startSession}
-                    className="btn-primary text-sm sm:text-base"
-                  >
-                    Play Again ({positions.find(p => p.id === selectedPosition)?.name || selectedPosition})
+                <p className="text-sm text-gray-500 mb-6">
+                  {sessionScore === sessionQuestions.length ? '🎉 Perfect score!' : sessionScore >= sessionQuestions.length / 2 ? '👍 Nice work!' : '💪 Keep practicing!'}
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <button onClick={startSession} className="btn-primary text-sm sm:text-base">
+                    Play Again
                   </button>
                   <button
                     onClick={() => {
@@ -250,24 +260,22 @@ function App() {
                     }}
                     className="btn-secondary text-sm sm:text-base"
                   >
-                    Choose New Position
+                    Change Position
                   </button>
                 </div>
               </div>
             )}
 
             {selectedPosition && scenarios.length === 0 && !isSessionModeActive && !showSessionResults && (
-              <div className="mt-2 p-3 bg-white shadow-md rounded-lg text-center animate-fade-in">
-                <p className="text-sm sm:text-base text-gray-700">
-                  No scenarios currently available for {positions.find(p => p.id === selectedPosition)?.name || selectedPosition}. Check back later!
+              <div className="mt-2 p-4 bg-[#23232a] border border-[#333642] rounded-lg text-center animate-fade-in">
+                <p className="text-sm sm:text-base text-gray-400">
+                  No scenarios available for {positions.find(p => p.id === selectedPosition)?.name || selectedPosition} yet. Check back later!
                 </p>
               </div>
             )}
             {!selectedPosition && !isSessionModeActive && !showSessionResults && (
-              <div className="mt-2 p-3 bg-white shadow-md rounded-lg text-center animate-fade-in">
-                <p className="text-sm sm:text-base text-gray-600">
-                  Please select a position to start.
-                </p>
+              <div className="mt-4 p-4 bg-[#23232a] border border-[#333642] rounded-lg text-center animate-fade-in">
+                <p className="text-sm text-gray-500">Select a position above to get started.</p>
               </div>
             )}
           </>
@@ -277,15 +285,18 @@ function App() {
 
   return (
     <div className="min-h-screen bg-baseball flex flex-col">
-      <header className="sticky top-0 z-20 bg-white/90 backdrop-blur-sm shadow-sm">
-        <div className="max-w-2xl mx-auto px-4 py-3">
-          <div className="flex flex-col items-center justify-between">
-            <img src={gloveWorkLogo} alt="Glove Work Logo" className="mx-auto w-full max-w-xs sm:max-w-md md:max-w-lg h-auto block" style={{ filter: 'invert(1) brightness(2)' }} />
-            <Navigation activeView={activeView} setActiveView={setActiveView} />
-          </div>
-          <p className="text-sm text-gray-600 mt-1 text-center">
+      <header className="sticky top-0 z-20 shadow-sm border-b border-[#333642]">
+        <div className="max-w-2xl mx-auto px-4 py-2 flex items-center justify-between gap-4">
+          <img
+            src={gloveWorkLogo}
+            alt="Glove Work"
+            className="h-10 w-auto"
+            style={{ filter: 'invert(1) brightness(2)' }}
+          />
+          <p className="hidden sm:block text-xs text-gray-500 flex-1 text-center">
             Master the fundamentals, one play at a time
           </p>
+          <Navigation activeView={activeView} setActiveView={setActiveView} />
         </div>
       </header>
 

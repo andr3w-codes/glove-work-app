@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { db } from '../db/clientConfig';
 
+const RANK_MEDALS = ['🥇', '🥈', '🥉'];
+
 const Leaderboard = () => {
   const [scores, setScores] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,15 +26,15 @@ const Leaderboard = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      <div className="flex justify-center items-center h-40">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+      <div className="bg-red-900/40 border border-red-700 text-red-300 px-4 py-3 rounded-lg">
         {error}
       </div>
     );
@@ -40,56 +42,49 @@ const Leaderboard = () => {
 
   return (
     <div className="max-w-2xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Leaderboard</h2>
-      
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Rank
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Player
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Score
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Scenarios Completed
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {scores.map((score, index) => (
-              <tr key={score.id} className={index < 3 ? 'bg-yellow-50' : ''}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">
-                    {index + 1}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
-                    {score.userId} {/* Replace with actual username when auth is implemented */}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
-                    {score.score}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
-                    {score.scenariosCompleted}
-                  </div>
-                </td>
+      <h2 className="text-2xl font-bold mb-4 text-gray-100">🏆 Leaderboard</h2>
+
+      {scores.length === 0 ? (
+        <div className="text-center py-12 text-gray-500 bg-[#23232a] rounded-lg border border-[#333642]">
+          No scores yet. Start playing to appear here!
+        </div>
+      ) : (
+        <div className="bg-[#23232a] border border-[#333642] rounded-lg overflow-hidden overflow-x-auto shadow">
+          <table className="min-w-full">
+            <thead className="bg-[#2d2d38]">
+              <tr>
+                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Rank</th>
+                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Player</th>
+                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Score</th>
+                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Completed</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-[#333642]">
+              {scores.map((score, index) => (
+                <tr
+                  key={score.id}
+                  className={index < 3 ? 'bg-yellow-900/20' : 'hover:bg-white/5 transition-colors'}
+                >
+                  <td className="px-5 py-4 whitespace-nowrap text-sm font-semibold text-gray-200">
+                    {index < 3 ? RANK_MEDALS[index] : index + 1}
+                  </td>
+                  <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-300">
+                    Player {score.userId?.slice(0, 8) ?? '—'}
+                  </td>
+                  <td className="px-5 py-4 whitespace-nowrap text-sm font-semibold text-blue-400">
+                    {score.score}
+                  </td>
+                  <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-400">
+                    {score.scenariosCompleted ?? '—'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
 
-export default Leaderboard; 
+export default Leaderboard;

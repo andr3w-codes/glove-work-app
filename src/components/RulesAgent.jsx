@@ -44,8 +44,8 @@ const RulesAgent = () => {
 
   return (
     <div className="w-full max-w-4xl mx-auto px-2 sm:px-4 py-2">
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Little League Rules Assistant</h2>
+      <div className="bg-[#23232a] border border-[#333642] rounded-lg shadow-lg p-6">
+        <h2 className="text-2xl font-bold text-gray-100 mb-4">Little League Rules Assistant</h2>
         
         {/* Chat History */}
         <div className="mb-6 h-[60vh] overflow-y-auto border border-gray-200 rounded-lg p-4">
@@ -116,8 +116,8 @@ const RulesAgent = () => {
               type="text"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
-              placeholder="Ask a question about little league rules..."
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Ask a rules question…"
+              className="flex-1 px-4 py-2 border border-[#333642] rounded-lg bg-[#18181b] text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
               type="submit"
@@ -133,8 +133,8 @@ const RulesAgent = () => {
           </div>
         </form>
 
-        <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-          <h3 className="font-semibold text-blue-800 mb-2">Official Resources</h3>
+        <div className="mt-6 p-4 bg-blue-900/20 border border-blue-800/40 rounded-lg">
+          <h3 className="font-semibold text-blue-300 mb-2">Official Resources</h3>
           <ul className="space-y-2">
             <li>
               <a
