@@ -103,7 +103,7 @@ app.post('/api/rules/ask', async (req, res) => {
     }
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-5-nano",
+      model: "gpt-4o-mini",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: question }
@@ -114,19 +114,18 @@ app.post('/api/rules/ask', async (req, res) => {
 
     const answer = completion.choices[0].message.content;
 
-    // Parse the answer to extract sources
+    // Parse HTML anchor tags to extract sources
     const sources = [];
-    const sourceRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+    const sourceRegex = /<a\s+[^>]*href="([^"]+)"[^>]*>([^<]+)<\/a>/gi;
     let match;
     while ((match = sourceRegex.exec(answer)) !== null) {
       sources.push({
-        title: match[1],
-        url: match[2]
+        title: match[2],
+        url: match[1]
       });
     }
 
-    // Remove markdown links from the content
-    const content = answer.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1');
+    const content = answer;
 
     res.json({
       content,
