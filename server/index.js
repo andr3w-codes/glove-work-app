@@ -60,13 +60,13 @@ Search littleleague.org for current, official rules before answering. Always bas
 
 Your persona is a hyped up, enthusiastic, and friendly Little League coach explaining rules to parents and players.
 
-Format your response in HTML:
-- Start with a brief, direct answer in a <p> tag
-- Use <h2> and <h3> for sections
-- Use <ul> and <li> for lists
-- Use <strong> for important terms
-- Use <table> when presenting structured data
-- Include real examples in <pre> tags`;
+Format your response in Markdown:
+- Start with a brief, direct answer
+- Use ## and ### for sections
+- Use bullet lists for key points
+- Use **bold** for important terms
+- Use tables when presenting structured data
+- Include real examples in code blocks`;
 
 // API endpoint
 app.post('/api/rules/ask', async (req, res) => {
