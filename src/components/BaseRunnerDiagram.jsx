@@ -182,9 +182,9 @@ function BaseRunnerDiagram({ baseRunners, outs, ballLocation, onBallLocationSele
                 fill="none"
                 initial={{ pathLength: 0 }}
                 animate={{ pathLength: 1 }}
-                transition={{ duration: 0.45, ease: 'easeOut' }}
+                transition={{ duration: 0.45, ease: 'easeOut', repeat: Infinity, repeatDelay: 1.1 }}
               />
-              {/* Layer 2: dashed trail — fades in as drawing animation finishes */}
+              {/* Layer 2: dashed trail — fades in then out each cycle */}
               <motion.path
                 d={`M 200 305 L ${ballTarget.x} ${ballTarget.y}`}
                 stroke="rgba(255, 230, 80, 0.75)"
@@ -193,14 +193,14 @@ function BaseRunnerDiagram({ baseRunners, outs, ballLocation, onBallLocationSele
                 strokeLinecap="round"
                 fill="none"
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.35, duration: 0.2 }}
+                animate={{ opacity: [0, 1, 1, 0] }}
+                transition={{ delay: 0.35, duration: 1.2, times: [0, 0.15, 0.75, 1], repeat: Infinity, repeatDelay: 0 }}
               />
-              {/* Layer 3: ball with spring physics */}
+              {/* Layer 3: ball travels then resets */}
               <motion.circle
                 initial={{ cx: 200, cy: 305 }}
-                animate={{ cx: ballTarget.x, cy: ballTarget.y }}
-                transition={{ type: 'spring', stiffness: 55, damping: 14 }}
+                animate={{ cx: [200, ballTarget.x, ballTarget.x, 200], cy: [305, ballTarget.y, ballTarget.y, 305] }}
+                transition={{ duration: 1.55, times: [0, 0.3, 0.8, 1], ease: 'easeOut', repeat: Infinity, repeatDelay: 0 }}
                 r="8"
                 fill="white"
                 stroke="#444"
