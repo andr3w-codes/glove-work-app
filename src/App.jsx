@@ -44,6 +44,8 @@ function AppInner() {
   const [currentSessionQuestionNum, setCurrentSessionQuestionNum] = useState(0);
   const [sessionScore, setSessionScore] = useState(0);
   const [showSessionResults, setShowSessionResults] = useState(false);
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [bestStreakThisSession, setBestStreakThisSession] = useState(0);
 
   // Load scenarios on mount
   useEffect(() => {
@@ -111,12 +113,23 @@ function AppInner() {
     setSessionQuestions(pool);
     setCurrentSessionQuestionNum(1);
     setSessionScore(0);
+    setCurrentStreak(0);
+    setBestStreakThisSession(0);
     setIsSessionModeActive(true);
     setShowSessionResults(false);
   };
 
   const handleAnswerInSession = (isCorrect) => {
-    if (isCorrect) setSessionScore(prev => prev + 1);
+    if (isCorrect) {
+      setSessionScore(prev => prev + 1);
+      setCurrentStreak(prev => {
+        const next = prev + 1;
+        setBestStreakThisSession(best => Math.max(best, next));
+        return next;
+      });
+    } else {
+      setCurrentStreak(0);
+    }
   };
 
   const handleNextQuestionInSession = async () => {
@@ -135,25 +148,20 @@ function AppInner() {
       saveCompletedIds(newIds);
 
       // Persist score to DB
-      if (!user) {
-        console.warn('Score not saved: no user session');
-      } else {
+      if (user) {
         try {
-          console.log('Saving score for user:', user.id, 'isAnonymous:', user.is_anonymous);
           const prev = await db.getUserScore(user.id);
-          console.log('Previous score record:', prev);
           const newScore = (prev?.score ?? 0) + sessionScore;
-          const scoreResult = await db.updateUserScore(user.id, {
+          await db.updateUserScore(user.id, {
             score: newScore,
             scenariosCompleted: (prev?.scenarios_completed ?? 0) + sessionQuestions.length,
             correctAnswers: (prev?.correct_answers ?? 0) + sessionScore,
+            bestStreak: Math.max(prev?.best_streak ?? 0, bestStreakThisSession),
             lastPlayed: new Date(),
           });
-          console.log('Score saved:', scoreResult);
-          const lbResult = await db.updateLeaderboardEntry(user.id, newScore);
-          console.log('Leaderboard updated:', lbResult);
+          await db.updateLeaderboardEntry(user.id, newScore);
         } catch (err) {
-          console.error('Score save failed:', err.message, err);
+          console.error('Score save failed:', err.message);
         }
       }
       return;

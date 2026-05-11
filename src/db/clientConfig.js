@@ -76,6 +76,7 @@ export const db = {
       score: scoreData.score,
       scenarios_completed: scoreData.scenariosCompleted,
       correct_answers: scoreData.correctAnswers,
+      best_streak: scoreData.bestStreak,
       last_played: scoreData.lastPlayed ?? new Date(),
     };
     const query = existing
