@@ -134,20 +134,26 @@ function AppInner() {
       ];
       saveCompletedIds(newIds);
 
-      // Persist score to DB (best-effort, don't block UI)
-      if (user) {
+      // Persist score to DB
+      if (!user) {
+        console.warn('Score not saved: no user session');
+      } else {
         try {
+          console.log('Saving score for user:', user.id, 'isAnonymous:', user.is_anonymous);
           const prev = await db.getUserScore(user.id);
+          console.log('Previous score record:', prev);
           const newScore = (prev?.score ?? 0) + sessionScore;
-          await db.updateUserScore(user.id, {
+          const scoreResult = await db.updateUserScore(user.id, {
             score: newScore,
             scenariosCompleted: (prev?.scenarios_completed ?? 0) + sessionQuestions.length,
             correctAnswers: (prev?.correct_answers ?? 0) + sessionScore,
             lastPlayed: new Date(),
           });
-          await db.updateLeaderboardEntry(user.id, newScore);
+          console.log('Score saved:', scoreResult);
+          const lbResult = await db.updateLeaderboardEntry(user.id, newScore);
+          console.log('Leaderboard updated:', lbResult);
         } catch (err) {
-          console.error('Score save failed:', err);
+          console.error('Score save failed:', err.message, err);
         }
       }
       return;
