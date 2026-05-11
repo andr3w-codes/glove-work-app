@@ -216,28 +216,14 @@ function AppInner() {
               </div>
             )}
 
-            {selectedPosition && scenarios.length > 0 && !showSessionResults && (
-              <div className="mt-2 mb-2 p-2 bg-[#23232a] border border-[#333642] rounded-lg text-center">
-                <h2 className="text-base sm:text-lg font-semibold text-gray-200">
-                  Playing as: <span className="text-blue-400">{positions.find(p => p.id === selectedPosition)?.name || selectedPosition}</span>
-                </h2>
-              </div>
-            )}
-
             {!isSessionModeActive && selectedPosition && scenarios.length > 0 && !showSessionResults && (
-              <div className="my-2 text-center">
+              <div className="my-3 text-center">
+                <p className="text-sm text-gray-500 mb-2">
+                  Playing as <span className="text-blue-400 font-semibold">{positions.find(p => p.id === selectedPosition)?.name || selectedPosition}</span>
+                </p>
                 <button onClick={startSession} className="btn-primary text-base sm:text-lg">
                   Start {Math.min(SESSION_LENGTH, getUnusedScenarios().length || SESSION_LENGTH)}-Question Session
                 </button>
-              </div>
-            )}
-
-            {isSessionModeActive && currentSessionQuestionNum > 0 && (
-              <div className="text-center mb-2 p-2 bg-blue-900/40 border border-blue-700 rounded-lg animate-fade-in">
-                <p className="text-sm sm:text-base font-semibold text-blue-200">
-                  Question {currentSessionQuestionNum} of {sessionQuestions.length}
-                </p>
-                <p className="text-xs sm:text-sm text-blue-300">Score: {sessionScore}</p>
               </div>
             )}
 
@@ -251,6 +237,7 @@ function AppInner() {
                   totalScenarios={sessionQuestions.length}
                   currentIndex={currentSessionQuestionNum - 1}
                   selectedPosition={selectedPosition}
+                  positionName={positions.find(p => p.id === selectedPosition)?.name || selectedPosition}
                   completedScenarioIds={completedScenarioIds}
                 />
               </div>

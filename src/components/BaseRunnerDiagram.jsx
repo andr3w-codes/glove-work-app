@@ -276,11 +276,8 @@ function BaseRunnerDiagram({
           fill="url(#gcDirtGrad)"
         />
 
-        {/* ── Infield grass ─────────────────────────────────────────────── */}
-        <polygon
-          points={`${HP.x},${HP.y - 2} ${BASE1.x},${BASE1.y} ${BASE2.x},${BASE2.y} ${BASE3.x},${BASE3.y}`}
-          fill="url(#gcInfieldGrass)"
-        />
+        {/* ── Infield grass — small oval inside the base paths ─────────── */}
+        <ellipse cx="200" cy="198" rx="68" ry="48" fill="url(#gcInfieldGrass)" />
 
         {/* ── Baselines ─────────────────────────────────────────────────── */}
         <line x1={HP.x}    y1={HP.y}    x2={BASE1.x} y2={BASE1.y} stroke="rgba(255,255,255,0.38)" strokeWidth="1.5" />

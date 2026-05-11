@@ -11,7 +11,7 @@ function shuffleArray(array) {
   return newArray;
 }
 
-function Flashcard({ scenario, onNextScenario, onAnswer, currentScore, totalScenarios, currentIndex, selectedPosition, completedScenarioIds }) {
+function Flashcard({ scenario, onNextScenario, onAnswer, currentScore, totalScenarios, currentIndex, selectedPosition, positionName, completedScenarioIds }) {
   const [showExplanation, setShowExplanation] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -58,11 +58,12 @@ function Flashcard({ scenario, onNextScenario, onAnswer, currentScore, totalScen
       {/* Progress and Score */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
-          <div className="text-sm font-medium text-gray-600">
-            Scenario {currentIndex + 1} of {totalScenarios}
+          <div className="text-sm font-medium text-gray-400">
+            {positionName && <span className="text-blue-400 font-semibold">{positionName} · </span>}
+            Q{currentIndex + 1} of {totalScenarios}
           </div>
-          <div className="text-sm font-semibold text-blue-600">
-            Score: {currentScore}
+          <div className="text-sm font-semibold text-blue-400">
+            {currentScore} pts
           </div>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
