@@ -9,6 +9,7 @@ export default function AuthModal({ onClose }) {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [checkEmail, setCheckEmail] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,7 +24,11 @@ export default function AuthModal({ onClose }) {
         onClose();
       }
     } catch (err) {
-      setError(err.message ?? 'Something went wrong. Please try again.');
+      if (err.message === 'CHECK_EMAIL') {
+        setCheckEmail(true);
+      } else {
+        setError(err.message ?? 'Something went wrong. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -48,7 +53,14 @@ export default function AuthModal({ onClose }) {
           </button>
         </div>
 
-        {success ? (
+        {checkEmail ? (
+          <div className="text-center py-4">
+            <p className="text-2xl mb-2">📧</p>
+            <p className="text-gray-200 font-semibold mb-1">Check your email</p>
+            <p className="text-gray-400 text-sm mb-4">We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account, then log in.</p>
+            <button onClick={() => { setCheckEmail(false); setTab('login'); }} className="btn-primary w-full">Go to Log In</button>
+          </div>
+        ) : success ? (
           <div className="text-center py-4">
             <p className="text-2xl mb-2">🎉</p>
             <p className="text-gray-200 font-semibold mb-1">Account created!</p>

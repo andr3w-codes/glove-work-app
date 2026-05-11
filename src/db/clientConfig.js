@@ -17,8 +17,6 @@ export const auth = {
     supabase.auth.signInWithPassword({ email, password }),
   signUp: (email, password) =>
     supabase.auth.signUp({ email, password }),
-  linkEmail: (email, password) =>
-    supabase.auth.updateUser({ email, password }),
   signOut: () => supabase.auth.signOut(),
   getSession: () => supabase.auth.getSession(),
   onAuthStateChange: (cb) => supabase.auth.onAuthStateChange(cb),

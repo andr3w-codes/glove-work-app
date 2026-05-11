@@ -36,10 +36,13 @@ export function AuthProvider({ children }) {
     return data;
   };
 
-  // Links an anonymous session to a real email account
   const signUp = async (email, password) => {
-    const { data, error } = await auth.linkEmail(email, password);
+    const { data, error } = await auth.signUp(email, password);
     if (error) throw error;
+    // If email confirmation is enabled, data.session will be null
+    if (!data.session) {
+      throw new Error('CHECK_EMAIL');
+    }
     return data;
   };
 
