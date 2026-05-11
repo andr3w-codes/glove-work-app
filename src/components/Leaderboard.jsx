@@ -3,7 +3,7 @@ import { db } from '../db/clientConfig';
 
 const RANK_MEDALS = ['🥇', '🥈', '🥉'];
 
-const Leaderboard = () => {
+const Leaderboard = ({ currentUserId }) => {
   const [scores, setScores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -63,13 +63,19 @@ const Leaderboard = () => {
               {scores.map((score, index) => (
                 <tr
                   key={score.id}
-                  className={index < 3 ? 'bg-yellow-900/20' : 'hover:bg-white/5 transition-colors'}
+                  className={
+                    score.user_id === currentUserId
+                      ? 'bg-blue-900/30 border-l-2 border-blue-500'
+                      : index < 3
+                      ? 'bg-yellow-900/20'
+                      : 'hover:bg-white/5 transition-colors'
+                  }
                 >
                   <td className="px-5 py-4 whitespace-nowrap text-sm font-semibold text-gray-200">
                     {index < 3 ? RANK_MEDALS[index] : index + 1}
                   </td>
                   <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-300">
-                    Player {score.userId?.slice(0, 8) ?? '—'}
+                    {score.user_id === currentUserId ? '⭐ You' : `Player ${score.user_id?.slice(0, 6) ?? '—'}`}
                   </td>
                   <td className="px-5 py-4 whitespace-nowrap text-sm font-semibold text-blue-400">
                     {score.score}

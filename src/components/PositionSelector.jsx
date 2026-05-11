@@ -14,10 +14,10 @@ function PositionSelector({ selectedPosition, onSelect }) {
             <button
               key={position.id}
               onClick={() => onSelect(position.id)}
-              className={`flex flex-col items-center justify-center p-4 rounded-lg border transition-all duration-200 font-semibold text-base shadow-md
+              className={`flex flex-col items-center justify-center p-4 rounded-lg border transition-all duration-200 font-semibold text-base shadow-md min-h-[72px]
                 ${isSelected ? 'bg-blue-700 border-blue-400 text-white scale-105' : 'bg-[#23232a] border-gray-700 text-gray-100 hover:bg-blue-800 hover:text-white hover:border-blue-500'}
               `}
-              style={{ minHeight: '72px' }}
+              style={undefined}
             >
               <span className="text-lg font-bold">{position.id}</span>
               <span className="text-xs mt-1 opacity-80">{position.name}</span>

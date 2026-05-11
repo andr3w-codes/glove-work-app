@@ -1,12 +1,14 @@
 import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 const NAV_ITEMS = [
   { id: 'practice', label: '⚾ Practice'        },
   { id: 'rules',    label: '📖 Rules Assistant' },
 ];
 
-const Navigation = ({ activeView, setActiveView }) => {
+const Navigation = ({ activeView, setActiveView, onOpenAuth }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, isAnonymous, signOut } = useAuth();
 
   const handleNavClick = (view) => {
     setActiveView(view);
@@ -59,20 +61,44 @@ const Navigation = ({ activeView, setActiveView }) => {
           </button>
         </div>
 
-        <nav className="px-3 py-4 space-y-1">
-          {NAV_ITEMS.map(({ id, label }) => (
-            <button
-              key={id}
-              onClick={() => handleNavClick(id)}
-              className={`w-full text-left px-4 py-3 rounded-lg transition-colors font-medium text-sm ${
-                activeView === id
-                  ? 'bg-blue-700 text-white'
-                  : 'text-gray-300 hover:bg-white/10 hover:text-white'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
+        <nav className="px-3 py-4 space-y-1 flex flex-col h-[calc(100%-57px)]">
+          <div className="space-y-1 flex-1">
+            {NAV_ITEMS.map(({ id, label }) => (
+              <button
+                key={id}
+                onClick={() => handleNavClick(id)}
+                className={`w-full text-left px-4 py-3 rounded-lg transition-colors font-medium text-sm ${
+                  activeView === id
+                    ? 'bg-blue-700 text-white'
+                    : 'text-gray-300 hover:bg-white/10 hover:text-white'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {/* Auth section at bottom of panel */}
+          <div className="pt-3 border-t border-[#333642]">
+            {isAnonymous ? (
+              <button
+                onClick={() => { setIsOpen(false); onOpenAuth?.(); }}
+                className="w-full px-4 py-3 rounded-lg text-sm font-medium text-blue-400 hover:bg-white/10 transition-colors text-left"
+              >
+                🔐 Create Account
+              </button>
+            ) : (
+              <div className="px-4 py-2">
+                <p className="text-xs text-gray-500 mb-2 truncate">{user?.email}</p>
+                <button
+                  onClick={() => { setIsOpen(false); signOut(); }}
+                  className="text-sm text-gray-400 hover:text-gray-200 transition-colors"
+                >
+                  Sign Out
+                </button>
+              </div>
+            )}
+          </div>
         </nav>
       </div>
     </>

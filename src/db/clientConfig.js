@@ -1,6 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Supabase client
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -10,114 +9,81 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Database helper functions
+// ─── Auth ────────────────────────────────────────────────────────────────────
+
+export const auth = {
+  signInAnonymously: () => supabase.auth.signInAnonymously(),
+  signInWithEmail: (email, password) =>
+    supabase.auth.signInWithPassword({ email, password }),
+  signUp: (email, password) =>
+    supabase.auth.signUp({ email, password }),
+  linkEmail: (email, password) =>
+    supabase.auth.updateUser({ email, password }),
+  signOut: () => supabase.auth.signOut(),
+  getSession: () => supabase.auth.getSession(),
+  onAuthStateChange: (cb) => supabase.auth.onAuthStateChange(cb),
+};
+
+// ─── Database ─────────────────────────────────────────────────────────────────
+
 export const db = {
-  // Custom Scenarios
-  async createCustomScenario(scenario) {
-    console.log('Creating scenario with data:', scenario);
-    
-    const { 
-      ballLocation,
-      baseRunners,
-      positionFocus,
-      createdAt,
-      updatedAt,
-      isApproved,
-      ...rest 
-    } = scenario;
-
-    const dbScenario = {
-      ...rest,
-      ball_location: ballLocation,
-      base_runners: baseRunners,
-      position_focus: positionFocus,
-      created_at: createdAt,
-      updated_at: updatedAt,
-      is_approved: isApproved
-    };
-
-    console.log('Converted to database format:', dbScenario);
-
-    const { data, error } = await supabase
-      .from('custom_scenarios')
-      .insert([dbScenario])
-      .select();
-    
-    if (error) throw error;
-    return data[0];
-  },
-
+  // Scenarios
   async getCustomScenarios() {
     const { data, error } = await supabase
       .from('custom_scenarios')
       .select('*')
       .eq('is_approved', true);
-    
     if (error) throw error;
-    return data.map(scenario => ({
-      ...scenario,
-      ballLocation: scenario.ball_location,
-      baseRunners: scenario.base_runners,
-      positionFocus: scenario.position_focus
+    return data.map(s => ({
+      ...s,
+      ballLocation: s.ball_location,
+      baseRunners: s.base_runners,
+      positionFocus: s.position_focus,
     }));
   },
 
-  async updateCustomScenario(id, updates) {
-    console.log('Updating scenario:', { id, updates });
-    
-    // Convert camelCase fields to snake_case for database
-    const { 
-      ballLocation,
-      baseRunners,
-      positionFocus,
-      createdAt,
-      updatedAt,
-      isApproved,
-      ...rest 
-    } = updates;
-
-    const dbUpdates = {
-      ...rest,
-      ball_location: ballLocation,
-      base_runners: baseRunners,
-      position_focus: positionFocus,
-      created_at: createdAt,
-      updated_at: updatedAt || new Date(), // Always update the updated_at timestamp
-      is_approved: isApproved
-    };
-
-    console.log('Converted to database format:', dbUpdates);
-
+  async createCustomScenario(scenario) {
+    const { ballLocation, baseRunners, positionFocus, createdAt, updatedAt, isApproved, ...rest } = scenario;
     const { data, error } = await supabase
       .from('custom_scenarios')
-      .update(dbUpdates)
-      .eq('id', id)
+      .insert([{
+        ...rest,
+        ball_location: ballLocation,
+        base_runners: baseRunners,
+        position_focus: positionFocus,
+        created_at: createdAt,
+        updated_at: updatedAt,
+        is_approved: isApproved,
+      }])
       .select();
-    
     if (error) throw error;
     return data[0];
   },
 
-  // User Scores
-  async updateUserScore(userId, scoreData) {
-    const { data, error } = await supabase
-      .from('user_scores')
-      .upsert({ userId, ...scoreData })
-      .select();
-    
-    if (error) throw error;
-    return data[0];
-  },
-
+  // User scores
   async getUserScore(userId) {
     const { data, error } = await supabase
       .from('user_scores')
       .select('*')
-      .eq('userId', userId)
-      .single();
-    
+      .eq('user_id', userId)
+      .maybeSingle();
     if (error) throw error;
-    return data;
+    return data; // null if no row yet
+  },
+
+  async updateUserScore(userId, scoreData) {
+    const { data, error } = await supabase
+      .from('user_scores')
+      .upsert({
+        user_id: userId,
+        score: scoreData.score,
+        scenarios_completed: scoreData.scenariosCompleted,
+        correct_answers: scoreData.correctAnswers,
+        last_played: scoreData.lastPlayed ?? new Date(),
+      }, { onConflict: 'user_id' })
+      .select();
+    if (error) throw error;
+    return data[0];
   },
 
   // Leaderboard
@@ -127,7 +93,6 @@ export const db = {
       .select('*')
       .order('score', { ascending: false })
       .limit(limit);
-    
     if (error) throw error;
     return data;
   },
@@ -135,10 +100,9 @@ export const db = {
   async updateLeaderboardEntry(userId, score) {
     const { data, error } = await supabase
       .from('leaderboard_entries')
-      .upsert({ userId, score, updatedAt: new Date() })
+      .upsert({ user_id: userId, score, updated_at: new Date() }, { onConflict: 'user_id' })
       .select();
-    
     if (error) throw error;
     return data[0];
-  }
-}; 
+  },
+};
