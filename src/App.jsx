@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import PositionSelector from './components/PositionSelector';
 import Flashcard from './components/Flashcard';
 import CustomScenarioForm from './components/CustomScenarioForm';
@@ -44,8 +44,8 @@ function AppInner() {
   const [currentSessionQuestionNum, setCurrentSessionQuestionNum] = useState(0);
   const [sessionScore, setSessionScore] = useState(0);
   const [showSessionResults, setShowSessionResults] = useState(false);
-  const [currentStreak, setCurrentStreak] = useState(0);
-  const [bestStreakThisSession, setBestStreakThisSession] = useState(0);
+  const streakRef = useRef(0);
+  const bestStreakRef = useRef(0);
 
   // Load scenarios on mount
   useEffect(() => {
@@ -113,8 +113,8 @@ function AppInner() {
     setSessionQuestions(pool);
     setCurrentSessionQuestionNum(1);
     setSessionScore(0);
-    setCurrentStreak(0);
-    setBestStreakThisSession(0);
+    streakRef.current = 0;
+    bestStreakRef.current = 0;
     setIsSessionModeActive(true);
     setShowSessionResults(false);
   };
@@ -122,13 +122,12 @@ function AppInner() {
   const handleAnswerInSession = (isCorrect) => {
     if (isCorrect) {
       setSessionScore(prev => prev + 1);
-      setCurrentStreak(prev => {
-        const next = prev + 1;
-        setBestStreakThisSession(best => Math.max(best, next));
-        return next;
-      });
+      streakRef.current += 1;
+      if (streakRef.current > bestStreakRef.current) {
+        bestStreakRef.current = streakRef.current;
+      }
     } else {
-      setCurrentStreak(0);
+      streakRef.current = 0;
     }
   };
 
@@ -156,7 +155,7 @@ function AppInner() {
             score: newScore,
             scenariosCompleted: (prev?.scenarios_completed ?? 0) + sessionQuestions.length,
             correctAnswers: (prev?.correct_answers ?? 0) + sessionScore,
-            bestStreak: Math.max(prev?.best_streak ?? 0, bestStreakThisSession),
+            bestStreak: Math.max(prev?.best_streak ?? 0, bestStreakRef.current),
             lastPlayed: new Date(),
           });
           await db.updateLeaderboardEntry(user.id, newScore);
