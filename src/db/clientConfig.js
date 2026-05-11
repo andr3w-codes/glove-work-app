@@ -70,16 +70,18 @@ export const db = {
   },
 
   async updateUserScore(userId, scoreData) {
-    const { data, error } = await supabase
-      .from('user_scores')
-      .upsert({
-        user_id: userId,
-        score: scoreData.score,
-        scenarios_completed: scoreData.scenariosCompleted,
-        correct_answers: scoreData.correctAnswers,
-        last_played: scoreData.lastPlayed ?? new Date(),
-      }, { onConflict: 'user_id' })
-      .select();
+    const existing = await this.getUserScore(userId);
+    const row = {
+      user_id: userId,
+      score: scoreData.score,
+      scenarios_completed: scoreData.scenariosCompleted,
+      correct_answers: scoreData.correctAnswers,
+      last_played: scoreData.lastPlayed ?? new Date(),
+    };
+    const query = existing
+      ? supabase.from('user_scores').update(row).eq('user_id', userId)
+      : supabase.from('user_scores').insert(row);
+    const { data, error } = await query.select();
     if (error) throw error;
     return data[0];
   },
@@ -96,10 +98,16 @@ export const db = {
   },
 
   async updateLeaderboardEntry(userId, score) {
-    const { data, error } = await supabase
+    const { data: existing } = await supabase
       .from('leaderboard_entries')
-      .upsert({ user_id: userId, score, updated_at: new Date() }, { onConflict: 'user_id' })
-      .select();
+      .select('id')
+      .eq('user_id', userId)
+      .maybeSingle();
+    const row = { user_id: userId, score, updated_at: new Date() };
+    const query = existing
+      ? supabase.from('leaderboard_entries').update(row).eq('user_id', userId)
+      : supabase.from('leaderboard_entries').insert(row);
+    const { data, error } = await query.select();
     if (error) throw error;
     return data[0];
   },
