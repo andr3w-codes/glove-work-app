@@ -2,53 +2,65 @@ import React, { useEffect, useState, useRef } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 
 // ─── Perspective field geometry (400 × 500 viewBox) ────────────────────────
+// Viewed from behind home plate: HP is wide/close at bottom,
+// 2B is narrow/far at top. The diamond is a kite/arrowhead shape.
 
-const HP    = { x: 200, y: 435 };
-const BASE1 = { x: 320, y: 272 };
-const BASE2 = { x: 200, y: 148 };
-const BASE3 = { x: 80,  y: 272 };
-const MOUND = { x: 200, y: 225 };
+const HP    = { x: 200, y: 432 };
+const BASE1 = { x: 344, y: 316 };   // 1B: wide & close to HP
+const BASE2 = { x: 200, y: 176 };   // 2B: far up, narrow
+const BASE3 = { x: 56,  y: 316 };   // 3B: symmetric with 1B
+const MOUND = { x: 200, y: 278 };
 
-const WALL_L  = { x: 10,  y: 105 };
-const WALL_CP = { x: 200, y: 15  };  // bezier control point for outfield arc
-const WALL_R  = { x: 390, y: 105 };
+const WALL_L  = { x: 10,  y: 108 };
+const WALL_CP = { x: 200, y: 18  };
+const WALL_R  = { x: 390, y: 108 };
 
 // Fielder label positions in perspective coords
 const FIELDERS = {
-  P:    { x: 200, y: 222 },
-  C:    { x: 200, y: 392 },
-  '1B': { x: 344, y: 260 },
-  '2B': { x: 264, y: 200 },
-  '3B': { x: 56,  y: 260 },
-  SS:   { x: 136, y: 200 },
+  P:    { x: 200, y: 275 },
+  C:    { x: 200, y: 390 },
+  '1B': { x: 362, y: 304 },
+  '2B': { x: 272, y: 228 },
+  '3B': { x: 38,  y: 304 },
+  SS:   { x: 128, y: 228 },
   LF:   { x: 72,  y: 122 },
   CF:   { x: 200, y: 76  },
   RF:   { x: 328, y: 122 },
 };
 
 // ─── Coordinate mapping ─────────────────────────────────────────────────────
+// t=0 at HP (old y=305), t=1 at deep CF (old y=50)
+// Segment break at t=0.412 (1B/3B level)
+
+const T_BREAK = 0.412;
+const NY_BREAK = BASE1.y;   // 316
+const NY_FAR   = 28;        // deep CF
+const POW_FAR  = 1.74;      // perspective compression exponent
 
 // Old 400×400 top-down → new 400×500 perspective
 function toPersp({ x: ox, y: oy }) {
   const t = Math.max(0, Math.min(1.1, (305 - oy) / 255));
-  const ny = t <= 0.41
-    ? HP.y - (t / 0.41) * (HP.y - BASE1.y)
-    : BASE1.y - ((t - 0.41) / 0.59) * (BASE1.y - 28);
-  const nx = 200 + (ox - 200) * (1 + t * 0.55);
+  const ny = t <= T_BREAK
+    ? HP.y - (t / T_BREAK) * (HP.y - NY_BREAK)
+    : NY_BREAK - Math.pow((t - T_BREAK) / (1 - T_BREAK), POW_FAR) * (NY_BREAK - NY_FAR);
+  const nx = 200 + (ox - 200) * (1 + t * 1.068);
   return {
     x: Math.max(5, Math.min(395, Math.round(nx))),
-    y: Math.max(28, Math.min(448, Math.round(ny))),
+    y: Math.max(25, Math.min(448, Math.round(ny))),
   };
 }
 
 // Perspective → old 400×400 top-down (for interactive mode storage)
 function fromPersp({ x: nx, y: ny }) {
-  const t = ny >= BASE1.y
-    ? ((HP.y - ny) / (HP.y - BASE1.y)) * 0.41
-    : 0.41 + ((BASE1.y - ny) / (BASE1.y - 28)) * 0.59;
+  let t;
+  if (ny >= NY_BREAK) {
+    t = ((HP.y - ny) / (HP.y - NY_BREAK)) * T_BREAK;
+  } else {
+    t = T_BREAK + (1 - T_BREAK) * Math.pow((NY_BREAK - ny) / (NY_BREAK - NY_FAR), 1 / POW_FAR);
+  }
   const tc = Math.max(0, Math.min(1.1, t));
   const oy = Math.round(305 - tc * 255);
-  const ox = Math.round(200 + (nx - 200) / (1 + tc * 0.55));
+  const ox = Math.round(200 + (nx - 200) / (1 + tc * 1.068));
   return {
     x: Math.max(0, Math.min(400, ox)),
     y: Math.max(0, Math.min(400, oy)),
@@ -259,25 +271,25 @@ function BaseRunnerDiagram({
           fill="none" stroke="#e8c030" strokeWidth="3"
         />
 
-        {/* ── Foul lines ────────────────────────────────────────────────── */}
-        <line x1={HP.x} y1={HP.y} x2={WALL_L.x} y2={WALL_L.y} stroke="white" strokeWidth="1.5" opacity="0.55" />
-        <line x1={HP.x} y1={HP.y} x2={WALL_R.x} y2={WALL_R.y} stroke="white" strokeWidth="1.5" opacity="0.55" />
+        {/* ── Foul lines — from HP through 3B/1B to the wall corners ────── */}
+        <line x1={HP.x} y1={HP.y} x2={WALL_L.x} y2={WALL_L.y} stroke="white" strokeWidth="1.5" opacity="0.5" />
+        <line x1={HP.x} y1={HP.y} x2={WALL_R.x} y2={WALL_R.y} stroke="white" strokeWidth="1.5" opacity="0.5" />
 
         {/* ── Infield dirt ──────────────────────────────────────────────── */}
         <path
           d={`
-            M ${HP.x},${HP.y + 18}
-            C ${BASE1.x + 32},${HP.y + 2}  ${BASE1.x + 36},${BASE1.y + 42} ${BASE1.x + 24},${BASE1.y}
-            C ${BASE1.x + 12},${BASE2.y + 18} ${BASE2.x + 58},${BASE2.y - 6}  ${BASE2.x},${BASE2.y - 12}
-            C ${BASE2.x - 58},${BASE2.y - 6} ${BASE3.x - 12},${BASE2.y + 18} ${BASE3.x - 24},${BASE3.y}
-            C ${BASE3.x - 36},${BASE3.y + 42} ${HP.x - 32},${HP.y + 2}  ${HP.x},${HP.y + 18}
+            M ${HP.x},${HP.y + 20}
+            C ${HP.x + 110},${HP.y + 14} ${BASE1.x + 34},${BASE1.y + 50} ${BASE1.x + 22},${BASE1.y}
+            C ${BASE1.x + 10},${BASE2.y + 22} ${BASE2.x + 52},${BASE2.y - 8}  ${BASE2.x},${BASE2.y - 14}
+            C ${BASE2.x - 52},${BASE2.y - 8} ${BASE3.x - 10},${BASE2.y + 22} ${BASE3.x - 22},${BASE3.y}
+            C ${BASE3.x - 34},${BASE3.y + 50} ${HP.x - 110},${HP.y + 14} ${HP.x},${HP.y + 20}
             Z
           `}
           fill="url(#gcDirtGrad)"
         />
 
-        {/* ── Infield grass — small oval inside the base paths ─────────── */}
-        <ellipse cx="200" cy="198" rx="68" ry="48" fill="url(#gcInfieldGrass)" />
+        {/* ── Infield grass — oval between bases ────────────────────────── */}
+        <ellipse cx="200" cy="230" rx="66" ry="50" fill="url(#gcInfieldGrass)" />
 
         {/* ── Baselines ─────────────────────────────────────────────────── */}
         <line x1={HP.x}    y1={HP.y}    x2={BASE1.x} y2={BASE1.y} stroke="rgba(255,255,255,0.38)" strokeWidth="1.5" />
@@ -287,20 +299,23 @@ function BaseRunnerDiagram({
 
         {/* ── Pitcher's mound ───────────────────────────────────────────── */}
         <ellipse cx={MOUND.x} cy={MOUND.y} rx="19" ry="12" fill="#ce9660" stroke="#9e6838" strokeWidth="1.5" />
-        <rect x="193" y="223" width="14" height="4" rx="1" fill="white" opacity="0.9" />
+        <rect x="193" y={MOUND.y - 2} width="14" height="4" rx="1" fill="white" opacity="0.9" />
 
         {/* ── Bases ─────────────────────────────────────────────────────── */}
-        <rect x="192" y="140" width="16" height="16" transform={`rotate(45 ${BASE2.x} ${BASE2.y})`} fill="white" stroke="#ccc" strokeWidth="1" />
-        <rect x="312" y="264" width="16" height="16" transform={`rotate(45 ${BASE1.x} ${BASE1.y})`} fill="white" stroke="#ccc" strokeWidth="1" />
-        <rect x="72"  y="264" width="16" height="16" transform={`rotate(45 ${BASE3.x} ${BASE3.y})`} fill="white" stroke="#ccc" strokeWidth="1" />
+        {/* 2B */}
+        <rect x={BASE2.x - 8} y={BASE2.y - 8} width="16" height="16" transform={`rotate(45 ${BASE2.x} ${BASE2.y})`} fill="white" stroke="#ccc" strokeWidth="1" />
+        {/* 1B */}
+        <rect x={BASE1.x - 8} y={BASE1.y - 8} width="16" height="16" transform={`rotate(45 ${BASE1.x} ${BASE1.y})`} fill="white" stroke="#ccc" strokeWidth="1" />
+        {/* 3B */}
+        <rect x={BASE3.x - 8} y={BASE3.y - 8} width="16" height="16" transform={`rotate(45 ${BASE3.x} ${BASE3.y})`} fill="white" stroke="#ccc" strokeWidth="1" />
 
         {/* ── Home plate ────────────────────────────────────────────────── */}
         <polygon
           points={`${HP.x},${HP.y + 14} ${HP.x + 13},${HP.y + 4} ${HP.x + 13},${HP.y - 10} ${HP.x - 13},${HP.y - 10} ${HP.x - 13},${HP.y + 4}`}
           fill="white" stroke="#ddd" strokeWidth="1"
         />
-        <rect x="172" y="425" width="13" height="20" fill="none" stroke="rgba(255,255,255,0.28)" strokeWidth="1" />
-        <rect x="215" y="425" width="13" height="20" fill="none" stroke="rgba(255,255,255,0.28)" strokeWidth="1" />
+        <rect x={HP.x - 28} y={HP.y - 8} width="13" height="20" fill="none" stroke="rgba(255,255,255,0.28)" strokeWidth="1" />
+        <rect x={HP.x + 15} y={HP.y - 8} width="13" height="20" fill="none" stroke="rgba(255,255,255,0.28)" strokeWidth="1" />
 
         {/* ── Fielder labels ────────────────────────────────────────────── */}
         {!isInteractive && Object.entries(FIELDERS).map(([pos, { x, y }]) => {
